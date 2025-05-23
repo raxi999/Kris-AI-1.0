@@ -1,62 +1,29 @@
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
 import wikipedia
 
 app = Flask(__name__)
 
-# --- Home route for Render root URL ---
 @app.route('/')
 def home():
-    return "Kris AI is live. Use POST /chat to talk with me."
+    return render_template('index.html')
 
-
-# --- Wikipedia summary function ---
-def get_wikipedia_summary(topic):
-    try:
-        return wikipedia.summary(topic, sentences=2)
-    except wikipedia.exceptions.PageError:
-        return "I couldn't find anything on that."
-    except:
-        return "I couldn't find anything on that."
-
-
-# --- Helper functions ---
-def is_wikipedia_query(message):
-    triggers = [
-        "tell me about", "could you explain", "give me information about",
-        "i want to know about", "do you know about", "please explain",
-        "what are", "who are", "details about", "information on",
-        "what's", "whats", "what's the", "whats the"
-    ]
-    return any(trigger in message.lower() for trigger in triggers)
-
-def extract_query(message):
-    for trigger in [
-        "tell me about", "could you explain", "give me information about",
-        "i want to know about", "do you know about", "please explain",
-        "what are", "who are", "details about", "information on",
-        "what's", "whats", "what's the", "whats the"
-    ]:
-        if trigger in message.lower():
-            return message.lower().split(trigger)[-1].strip()
-    return message.strip()
-
-
-# --- Flask /chat route ---
-@app.route("/chat", methods=["POST"])
+@app.route('/chat', methods=['POST'])
 def chat():
-    user_message = request.json.get("message", "")
-    
-    if is_wikipedia_query(user_message):
-        topic = extract_query(user_message)
-        reply = get_wikipedia_summary(topic)
-        return jsonify({"reply": reply, "mood": "fact-checking"})
-    
-    return jsonify({
-        "reply": "I'm still learning. Ask me something factual!",
-        "mood": "neutral"
-    })
+    user_message = request.json.get('message', '').lower()
+    wiki_phrases = ['tell me about', 'what is', 'who is', 'explain', 'give me information about', 'can you tell me about']
 
+    if any(phrase in user_message for phrase in wiki_phrases):
+        try:
+            topic = user_message
+            for phrase in wiki_phrases:
+                topic = topic.replace(phrase, '')
+            topic = topic.strip()
+            summary = wikipedia.summary(topic, sentences=2)
+            return jsonify({'response': summary})
+        except Exception:
+            return jsonify({'response': "Sorry, I couldn't find information on that."})
 
-# --- Run the app (if running locally) ---
-if __name__ == "__main__":
-    app.run(debug=True) 
+    return jsonify({'response': "I'm here to help with your questions!"})
+
+if __name__ == '__main__':
+    app.run(debug=True)
