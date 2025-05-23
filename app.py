@@ -8,9 +8,6 @@ app = Flask(__name__)
 def home():
     return render_template("index.html")
 
-def make_reply_friendly(summary):
-    return summary  # We add friendly intros directly in get_wikipedia_summary()
-
 def get_wikipedia_summary(query):
     intros = [
         f"Here's what I found about {query}:",
@@ -33,7 +30,8 @@ def get_wikipedia_summary(query):
         summary = wikipedia.summary(query, sentences=2)
         return f"{intro}\n\n{summary}"
     except wikipedia.DisambiguationError as e:
-        return f"There are multiple results for '{query}'. Try to be more specific like:\n- {e.options[0]}\n- {e.options[1]}"
+        options = '\n- '.join(e.options[:5])  # show 5 options max
+        return f"There are multiple results for '{query}'. Try to be more specific like:\n- {options}"
     except wikipedia.PageError:
         return f"Oops! I couldn’t find anything about '{query}'."
     except Exception as e:
@@ -60,7 +58,10 @@ def extract_wiki_query(text, triggers):
 
 @app.route("/chat", methods=["POST"])
 def chat():
-    user_input = request.json["message"].strip()
+    data = request.json
+    user_input = data.get("message", "").strip()
+    print(f"Received user input: {user_input}")  # Debug print
+
     user_input_lower = user_input.lower()
 
     # Greetings
@@ -69,7 +70,7 @@ def chat():
         return jsonify({"reply": "Hi there! How can I help you today?"})
 
     # Owner info
-    if "who is your owner" in user_input_lower or "who made you" in user_input_lower or "your creator" in user_input_lower:
+    if any(phrase in user_input_lower for phrase in ["who is your owner", "who made you", "your creator"]):
         return jsonify({"reply": "I was created by Yashwanth, a 15-year-old developer from Andhra Pradesh using just GitHub and Render."})
 
     # Wikipedia triggers
@@ -80,12 +81,14 @@ def chat():
     ]
 
     query = extract_wiki_query(user_input_lower, wiki_triggers)
+    print(f"Extracted wiki query: {query}")  # Debug print
 
     if query:
         reply = get_wikipedia_summary(query)
     else:
         reply = "Can you please be more specific? Ask me something like 'What is Python?' or 'Tell me about Elon Musk'."
 
+    print(f"Replying with: {reply}")  # Debug print
     return jsonify({"reply": reply})
 
 if __name__ == "__main__":
