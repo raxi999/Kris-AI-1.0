@@ -1,38 +1,50 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
 import wikipedia
 import re
 
 app = Flask(__name__)
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+# --- Helper functions ---
 
-@app.route('/chat', methods=['POST'])
+def is_wikipedia_query(message):
+    pattern = r"\b(what is|what's|who is|who are|can you tell me about|could you explain|give me information about|i want to know about|do you know about|please explain|what are|details about|information on|whats the|what's the)\b"
+    return re.search(pattern, message.lower())
+
+def extract_query(message):
+    keywords = [
+        "what is", "what's", "who is", "who are", "can you tell me about",
+        "could you explain", "give me information about", "i want to know about",
+        "do you know about", "please explain", "what are", "details about",
+        "information on", "whats the", "what's the"
+    ]
+    for key in keywords:
+        if key in message.lower():
+            return message.lower().split(key)[-1].strip()
+    return message
+
+def get_wikipedia_summary(query):
+    try:
+        wikipedia.set_lang("en")
+        return wikipedia.summary(query, sentences=2)
+    except wikipedia.exceptions.DisambiguationError as e:
+        return f"Too many results. Be more specific: {e.options[:3]}"
+    except wikipedia.exceptions.PageError:
+        return "I couldn't find anything on that."
+
+# --- Flask route ---
+
+@app.route("/chat", methods=["POST"])
 def chat():
-    data = request.json
-    user_msg = data.get('message', '')
-    # Simple reply logic
-    reply = f"Krisna: You said '{user_msg}'. This is a prototype reply."
-    return jsonify({'reply': reply})
+    user_message = request.json.get("message", "")
 
-if __name__ == '__main__':
+    if is_wikipedia_query(user_message):
+        topic = extract_query(user_message)
+        reply = get_wikipedia_summary(topic)
+        return jsonify({"reply": reply, "mood": "fact-checking"})
+
+    # Default reply if no Wikipedia query detected
+    return jsonify({"reply": "I'm still learning. Ask me something factual!", "mood": "neutral"})
+
+# Run the app (if running locally)
+if __name__ == "__main__":
     app.run(debug=True)
-from flask import request, jsonify
-import requests
-
-@app.route('/wiki-summary', methods=['GET'])
-def wiki_summary():
-    query = request.args.get('query')
-    if not query:
-        return jsonify({'error': 'No query parameter provided'}), 400
-
-    url = f"https://en.wikipedia.org/api/rest_v1/page/summary/{query}"
-    response = requests.get(url)
-
-    if response.status_code == 200:
-        data = response.json()
-        summary = data.get('extract', 'No summary available.')
-        return jsonify({'summary': summary})
-    else:
-        return jsonify({'error': 'Wikipedia page not found'}), 404
