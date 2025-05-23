@@ -79,6 +79,18 @@ def get_wikipedia_summary(query):
     except wikipedia.exceptions.PageError:
         return "I couldn't find anything on that."
 
+# --- Wikipedia summary function ---
+def get_wikipedia_summary(topic):
+    try:
+        return wikipedia.summary(topic, sentences=2)
+    except:
+        return "I couldn't find anything on that."
+
+# --- Home route for Render root URL ---
+@app.route('/')
+def home():
+    return "Kris AI is live. Use POST /chat to talk with me."
+
 # --- Flask route ---
 
 @app.route("/chat", methods=["POST"])
