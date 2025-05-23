@@ -1,110 +1,62 @@
 from flask import Flask, request, jsonify
 import wikipedia
-import re
 
 app = Flask(__name__)
-
-# --- Helper functions ---
-
-def is_wikipedia_query(message):
-    pattern = r"\b(what is|what's|who is|who are|can you tell me about|could you explain|give me information about|i want to know about|do you know about|please explain|what are|details about|information on|whats the|what's the)\b"
-    return re.search(pattern, message.lower())
-
-def extract_query(message):
-    keywords = [
-        "what is", "what's", "who is", "who are", "can you tell me about",
-        "could you explain", "give me information about", "i want to know about",
-        "do you know about", "please explain", "what are", "details about",
-        "information on", "whats the", "what's the"
-    ]
-    for keyword in keywords:
-        if keyword in message.lower():
-            return message.lower().split(keyword)[-1].strip()
-    return message
-
-# --- Routes ---
-
-@app.route('/')
-def home():
-    return "Kris AI is live. Use POST /chat with a message to get a response."
-
-@app.route('/chat', methods=['POST'])
-def chat():
-    data = request.json
-    message = data.get('message', '')
-
-    if is_wikipedia_query(message):
-        topic = extract_query(message)
-        try:
-            summary = wikipedia.summary(topic, sentences=2)
-            return jsonify({'reply': summary})
-        except:
-            return jsonify({'reply': "Sorry, I couldn't find information on that."})
-    else:
-        return jsonify({'reply': "This is a default response from Kris AI."})
-
-# --- Run Server (for local or Render) ---
-
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=10000)from flask import Flask, request, jsonify
-import wikipedia
-import re
-
-app = Flask(__name__)
-
-# --- Helper functions ---
-
-def is_wikipedia_query(message):
-    pattern = r"\b(what is|what's|who is|who are|can you tell me about|could you explain|give me information about|i want to know about|do you know about|please explain|what are|details about|information on|whats the|what's the)\b"
-    return re.search(pattern, message.lower())
-
-def extract_query(message):
-    keywords = [
-        "what is", "what's", "who is", "who are", "can you tell me about",
-        "could you explain", "give me information about", "i want to know about",
-        "do you know about", "please explain", "what are", "details about",
-        "information on", "whats the", "what's the"
-    ]
-    for key in keywords:
-        if key in message.lower():
-            return message.lower().split(key)[-1].strip()
-    return message
-
-def get_wikipedia_summary(query):
-    try:
-        wikipedia.set_lang("en")
-        return wikipedia.summary(query, sentences=2)
-    except wikipedia.exceptions.DisambiguationError as e:
-        return f"Too many results. Be more specific: {e.options[:3]}"
-    except wikipedia.exceptions.PageError:
-        return "I couldn't find anything on that."
-
-# --- Wikipedia summary function ---
-def get_wikipedia_summary(topic):
-    try:
-        return wikipedia.summary(topic, sentences=2)
-    except:
-        return "I couldn't find anything on that."
 
 # --- Home route for Render root URL ---
 @app.route('/')
 def home():
     return "Kris AI is live. Use POST /chat to talk with me."
 
-# --- Flask route ---
 
+# --- Wikipedia summary function ---
+def get_wikipedia_summary(topic):
+    try:
+        return wikipedia.summary(topic, sentences=2)
+    except wikipedia.exceptions.PageError:
+        return "I couldn't find anything on that."
+    except:
+        return "I couldn't find anything on that."
+
+
+# --- Helper functions ---
+def is_wikipedia_query(message):
+    triggers = [
+        "tell me about", "could you explain", "give me information about",
+        "i want to know about", "do you know about", "please explain",
+        "what are", "who are", "details about", "information on",
+        "what's", "whats", "what's the", "whats the"
+    ]
+    return any(trigger in message.lower() for trigger in triggers)
+
+def extract_query(message):
+    for trigger in [
+        "tell me about", "could you explain", "give me information about",
+        "i want to know about", "do you know about", "please explain",
+        "what are", "who are", "details about", "information on",
+        "what's", "whats", "what's the", "whats the"
+    ]:
+        if trigger in message.lower():
+            return message.lower().split(trigger)[-1].strip()
+    return message.strip()
+
+
+# --- Flask /chat route ---
 @app.route("/chat", methods=["POST"])
 def chat():
     user_message = request.json.get("message", "")
-
+    
     if is_wikipedia_query(user_message):
         topic = extract_query(user_message)
         reply = get_wikipedia_summary(topic)
         return jsonify({"reply": reply, "mood": "fact-checking"})
+    
+    return jsonify({
+        "reply": "I'm still learning. Ask me something factual!",
+        "mood": "neutral"
+    })
 
-    # Default reply if no Wikipedia query detected
-    return jsonify({"reply": "I'm still learning. Ask me something factual!", "mood": "neutral"})
 
-# Run the app (if running locally)
+# --- Run the app (if running locally) ---
 if __name__ == "__main__":
     app.run(debug=True)
