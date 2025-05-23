@@ -1,95 +1,59 @@
 from flask import Flask, request, jsonify, render_template
 import wikipedia
 import random
+import os
 
 app = Flask(__name__)
 
-@app.route("/")
+# Mood-based greetings
+greetings = ['hi', 'hello', 'hey', 'yoo']
+basic_replies = [
+    "Hey there! I'm Kris AI, your smart assistant. Made by Yashwanth, a 15-year-old coder using just GitHub and Render.",
+    "Hello! How can I help you today?",
+    "Hi! I'm Kris AI. Ask me anything, I’m ready.",
+    "Hey! Let’s explore some knowledge together."
+]
+
+# Smart Wiki trigger phrases
+wiki_triggers = [
+    'tell me about', 'explain', 'who is', 'what is', 'what are',
+    'give me information about', 'i want to know about', 'do you know about',
+    'please explain', 'details about', 'information on', 'what’s', 'whats the', 'who are', 'what’s the'
+]
+
+@app.route('/')
 def home():
     return render_template("index.html")
 
-def get_wikipedia_summary(query):
-    intros = [
-        f"Here's what I found about {query}:",
-        f"Let me explain a bit about {query}:",
-        f"This is interesting — check this out about {query}:",
-        f"Okay, here’s a quick overview of {query}:",
-        f"Let me share some info on {query}:",
-        f"I looked this up for you — here’s what {query} is about:",
-        f"Here’s a brief explanation about {query}:",
-        f"Let me tell you what I found on {query}:",
-        f"Here’s some info on {query} you might like:",
-        f"Got it! Here’s what {query} means:",
-        f"Let me break down {query} for you:",
-        f"Here’s a quick summary about {query}:",
-        f"Alright, here’s what I know about {query}:",
-        f"Check this out — here’s info on {query}:"
-    ]
-    intro = random.choice(intros)
-    try:
-        summary = wikipedia.summary(query, sentences=2)
-        return f"{intro}\n\n{summary}"
-    except wikipedia.DisambiguationError as e:
-        options = '\n- '.join(e.options[:5])  # show 5 options max
-        return f"There are multiple results for '{query}'. Try to be more specific like:\n- {options}"
-    except wikipedia.PageError:
-        return f"Oops! I couldn’t find anything about '{query}'."
-    except Exception as e:
-        return f"Something went wrong: {str(e)}"
-
-def is_query_valid(text):
-    text = text.strip().lower()
-    invalid_inputs = [
-        "", "what", "who", "why", "when", "how", "where", "?", 
-        "what is", "who is", "tell me", "explain", "can you tell me"
-    ]
-    return not (text in invalid_inputs or len(text) < 4)
-
-def extract_wiki_query(text, triggers):
-    text = text.lower().strip()
-    for trigger in triggers:
-        if trigger in text:
-            cleaned = text.replace(trigger, "").strip()
-            if is_query_valid(cleaned):
-                return cleaned
-            else:
-                return None
-    return None
-
-@app.route("/chat", methods=["POST"])
+@app.route('/chat', methods=['POST'])
 def chat():
-    data = request.json
-    user_input = data.get("message", "").strip()
-    print(f"Received user input: {user_input}")  # Debug print
+    user_msg = request.json.get("message", "").lower().strip()
 
-    user_input_lower = user_input.lower()
+    # Greet
+    if user_msg in greetings:
+        return jsonify({'reply': random.choice(basic_replies)})
 
-    # Greetings
-    greetings = ["hi", "hello", "hey", "yo", "yoo", "heyy"]
-    if user_input_lower in greetings:
-        return jsonify({"reply": "Hi there! How can I help you today?"})
+    # Owner
+    if "who is your owner" in user_msg or "who made you" in user_msg:
+        return jsonify({'reply': "I was created by Yashwanth, a smart 15-year-old from Andhra Pradesh using only GitHub and Render!"})
 
-    # Owner info
-    if any(phrase in user_input_lower for phrase in ["who is your owner", "who made you", "your creator"]):
-        return jsonify({"reply": "I was created by Yashwanth, a 15-year-old developer from Andhra Pradesh using just GitHub and Render."})
+    # Wiki-style queries
+    for phrase in wiki_triggers:
+        if phrase in user_msg:
+            try:
+                topic = user_msg.replace(phrase, '').strip()
+                summary = wikipedia.summary(topic, sentences=2)
+                return jsonify({'reply': f"Here's what I found about **{topic.title()}**:\n{summary}"})
+            except Exception:
+                return jsonify({'reply': "Sorry, I couldn’t find information on that. Try rephrasing it."})
 
-    # Wikipedia triggers
-    wiki_triggers = [
-        "who is", "what is", "can you tell me about", "could you explain", "give me information about",
-        "i want to know about", "do you know about", "please explain", "what are", "who are", 
-        "details about", "information on", "what's", "whats", "what's the", "whats the"
-    ]
+    # "What" or similar single-word confusion
+    if user_msg in ['what', 'why', 'how']:
+        return jsonify({'reply': f"Could you please clarify your question? I'm here to help!"})
 
-    query = extract_wiki_query(user_input_lower, wiki_triggers)
-    print(f"Extracted wiki query: {query}")  # Debug print
+    return jsonify({'reply': "I'm not sure about that yet, but I'm learning! Try asking me about a famous person or topic."})
 
-    if query:
-        reply = get_wikipedia_summary(query)
-    else:
-        reply = "Can you please be more specific? Ask me something like 'What is Python?' or 'Tell me about Elon Musk'."
-
-    print(f"Replying with: {reply}")  # Debug print
-    return jsonify({"reply": reply})
-
-if __name__ == "__main__":
-    app.run(debug=True)
+# Render-compatible run
+if __name__ == '__main__':
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
