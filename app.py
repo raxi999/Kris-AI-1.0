@@ -1,76 +1,78 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import wikipedia
 
 app = Flask(__name__)
 
-# Number of sentences in Wikipedia summary response
-SUMMARY_SENTENCES = 3
-
-# List of trigger phrases to detect Wikipedia queries
-WIKI_TRIGGERS = [
-    'tell me about',
-    'what is',
-    'what are',
-    'who is',
-    'who are',
-    'explain',
-    'give me information about',
-    'can you tell me about',
-    'do you know about',
-    'details about',
-    'information on',
-    "what's",
-    "whats",
-    "define",
-]
-
-def extract_topic(message):
-    msg = message.lower()
-    for phrase in WIKI_TRIGGERS:
-        if phrase in msg:
-            # Extract text after the trigger phrase as the topic
-            topic = msg.split(phrase, 1)[1]
-            topic = topic.strip(" ?.")
-            return topic
-    # If no trigger phrase found, treat whole message as topic
-    return message.strip(" ?.")
-
-@app.route('/')
+@app.route("/")
 def home():
-    return render_template('index.html')
+    return render_template("index.html")
 
-@app.route('/chat', methods=['POST'])
-def chat():
-    user_message = request.json.get('message', '').strip()
-    topic = extract_topic(user_message)
+# Make replies sound friendly
+def make_reply_friendly(summary):
+    return f"Sure! Here's a simple explanation:\n{summary}"
 
-    if not topic:
-        return jsonify({'response': "Could you please clarify your question?"})
-
+# Wikipedia fetcher
+def get_wikipedia_summary(query):
     try:
-        # Search Wikipedia for best matching page titles
-        search_results = wikipedia.search(topic)
-
-        if not search_results:
-            return jsonify({'response': "Sorry, I couldn't find any information on that topic."})
-
-        page_title = search_results[0]  # Pick the best result
-
-        # Get summary of the page
-        summary = wikipedia.summary(page_title, sentences=SUMMARY_SENTENCES)
-
-        return jsonify({'response': summary})
-
+        summary = wikipedia.summary(query, sentences=2)
+        return make_reply_friendly(summary)
     except wikipedia.DisambiguationError as e:
-        options = ', '.join(e.options[:5])
-        response = f"Your question is ambiguous. Did you mean: {options}?"
-        return jsonify({'response': response})
-
+        return f"There are multiple results for '{query}'. Try to be more specific like:\n- {e.options[0]}\n- {e.options[1]}"
     except wikipedia.PageError:
-        return jsonify({'response': "Sorry, I couldn't find any page matching that topic."})
+        return f"Oops! I couldn’t find anything about '{query}'."
+    except Exception as e:
+        return f"Something went wrong: {str(e)}"
 
-    except Exception:
-        return jsonify({'response': "Sorry, I encountered an error while searching. Please try again."})
+# Check if query is meaningful
+def is_query_valid(text):
+    text = text.strip().lower()
+    invalid_inputs = [
+        "", "what", "who", "why", "when", "how", "where", "?", 
+        "what is", "who is", "tell me", "explain", "can you tell me"
+    ]
+    return not (text in invalid_inputs or len(text) < 4)
 
-if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0')
+# Extract Wikipedia-friendly phrase
+def extract_wiki_query(text, triggers):
+    text = text.lower().strip()
+    for trigger in triggers:
+        if trigger in text:
+            cleaned = text.replace(trigger, "").strip()
+            if is_query_valid(cleaned):
+                return cleaned
+            else:
+                return None
+    return None
+
+@app.route("/chat", methods=["POST"])
+def chat():
+    user_input = request.json["message"].strip()
+    user_input_lower = user_input.lower()
+
+    # Greetings
+    greetings = ["hi", "hello", "hey", "yo", "yoo", "heyy"]
+    if user_input_lower in greetings:
+        return jsonify({"reply": "Hi there! How can I help you today?"})
+
+    # Owner info
+    if "who is your owner" in user_input_lower or "who made you" in user_input_lower or "your creator" in user_input_lower:
+        return jsonify({"reply": "I was created by Yashwanth, a 15-year-old developer from Andhra Pradesh using just GitHub and Render."})
+
+    # Wikipedia triggers
+    wiki_triggers = [
+        "who is", "what is", "can you tell me about", "could you explain", "give me information about",
+        "i want to know about", "do you know about", "please explain", "what are", "who are", 
+        "details about", "information on", "what's", "whats", "what's the", "whats the"
+    ]
+
+    query = extract_wiki_query(user_input_lower, wiki_triggers)
+
+    if query:
+        reply = get_wikipedia_summary(query)
+    else:
+        reply = "Can you please be more specific? Ask me something like 'What is Python?' or 'Tell me about Elon Musk'."
+
+    return jsonify({"reply": reply})
+
+if __name__ == "__main__":
+    app.run(debug=True)
