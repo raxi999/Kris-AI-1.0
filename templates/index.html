@@ -2,101 +2,186 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Chat Prototype</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kris AI Chatbot</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #222;
-      color: white;
+      margin: 0;
+      padding: 0;
+      font-family: "Segoe UI", sans-serif;
+      background-color: #e1f5fe;
       display: flex;
       flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
       height: 100vh;
-      margin: 0;
-      padding: 10px;
     }
-    #chatBox {
-      flex: 1;
+
+    .face {
+      margin-top: 30px;
+      width: 120px;
+      height: 120px;
+      background-color: #81d4fa;
+      border-radius: 50%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .face::before {
+      content: "";
+      position: absolute;
+      top: -20px;
+      left: 40px;
+      width: 30px;
+      height: 50px;
+      background: radial-gradient(circle at center, #1b5e20 30%, #66bb6a 60%, #b2ff59 100%);
+      border-radius: 50% 50% 50% 50%;
+      transform: rotate(-20deg);
+    }
+
+    .eyes {
+      position: absolute;
+      top: 35%;
+      display: flex;
+      gap: 25px;
+    }
+
+    .eye {
+      width: 10px;
+      height: 10px;
+      background: #01579b;
+      border-radius: 50%;
+    }
+
+    .mouth {
+      position: absolute;
+      bottom: 30%;
+      width: 40px;
+      height: 20px;
+      border-bottom: 3px solid #01579b;
+      border-radius: 0 0 50px 50px;
+    }
+
+    .chat-box {
+      margin-top: 20px;
+      width: 90%;
+      max-width: 450px;
+      background-color: #ffffff;
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .messages {
+      height: 300px;
       overflow-y: auto;
-      border: 1px solid #555;
-      padding: 10px;
-      margin-bottom: 10px;
-      background: #333;
-      border-radius: 5px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 15px;
     }
-    .user-message {
-      text-align: right;
-      background: #4caf50;
-      color: #fff;
-      margin: 5px 0;
-      padding: 8px 12px;
-      border-radius: 15px 15px 0 15px;
-      max-width: 70%;
+
+    .msg {
+      padding: 10px 15px;
+      border-radius: 12px;
+      max-width: 80%;
+    }
+
+    .user {
       align-self: flex-end;
+      background-color: #c5e1a5;
     }
-    .bot-message {
-      text-align: left;
-      background: #555;
-      color: #eee;
-      margin: 5px 0;
-      padding: 8px 12px;
-      border-radius: 15px 15px 15px 0;
-      max-width: 70%;
+
+    .bot {
       align-self: flex-start;
+      background-color: #b3e5fc;
     }
-    #userInput {
+
+    .input-area {
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
       padding: 10px;
-      border-radius: 5px;
-      border: none;
-      font-size: 16px;
-      width: 100%;
-      box-sizing: border-box;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      font-size: 1em;
     }
-    #userInput:focus {
-      outline: none;
-      box-shadow: 0 0 5px #4caf50;
+
+    button {
+      background-color: #0288d1;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-size: 1em;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
+  <div class="face">
+    <div class="eyes">
+      <div class="eye"></div>
+      <div class="eye"></div>
+    </div>
+    <div class="mouth" id="mood-mouth"></div>
+  </div>
 
-  <div id="chatBox"></div>
-  <input type="text" id="userInput" placeholder="Type your message and press Enter" autocomplete="off" />
+  <div class="chat-box">
+    <div class="messages" id="messages"></div>
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Type a message..." />
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
 
   <script>
-    const inputBox = document.getElementById('userInput');
-    const chatBox = document.getElementById('chatBox');
+    function sendMessage() {
+      const input = document.getElementById("userInput");
+      const text = input.value.trim();
+      if (!text) return;
 
-    function appendMessage(sender, text) {
-      const msgDiv = document.createElement('div');
-      msgDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
-      msgDiv.textContent = text;
-      chatBox.appendChild(msgDiv);
-      chatBox.scrollTop = chatBox.scrollHeight;
+      const messages = document.getElementById("messages");
+
+      const userMsg = document.createElement("div");
+      userMsg.className = "msg user";
+      userMsg.textContent = text;
+      messages.appendChild(userMsg);
+
+      fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text })
+      })
+      .then(res => res.json())
+      .then(data => {
+        const botMsg = document.createElement("div");
+        botMsg.className = "msg bot";
+        botMsg.textContent = data.reply;
+        messages.appendChild(botMsg);
+
+        updateMoodFace(data.mood);
+        input.value = "";
+        messages.scrollTop = messages.scrollHeight;
+      });
     }
 
-    inputBox.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        const message = inputBox.value.trim();
-        if (!message) return;
-        appendMessage('user', message);
-        inputBox.value = '';
-
-        fetch('/chat', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({message: message})
-        })
-        .then(res => res.json())
-        .then(data => {
-          appendMessage('bot', data.response);
-        })
-        .catch(() => {
-          appendMessage('bot', 'Oops! Something went wrong.');
-        });
+    function updateMoodFace(mood) {
+      const mouth = document.getElementById("mood-mouth");
+      if (mood === "happy") {
+        mouth.style.borderBottom = "3px solid #01579b";
+      } else if (mood === "informative") {
+        mouth.style.borderBottom = "none";
+        mouth.style.borderTop = "3px solid #01579b";
+      } else {
+        mouth.style.borderBottom = "2px solid #01579b";
       }
-    });
+    }
   </script>
-
 </body>
-</html> 
+</html>
