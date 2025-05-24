@@ -1,68 +1,65 @@
 from flask import Flask, render_template, request, jsonify
 import wikipedia
-import random
+import re
 
 app = Flask(__name__)
 
-@app.route("/")
-def index():
-    return render_template("index.html")
+def get_clean_summary(query):
+    try:
+        wikipedia.set_lang("en")
+        if len(query.strip()) < 3 or query.lower() in ["you", "me", "he", "she", "yoo", "yeah"]:
+            return "Could you please clarify your question a bit more?", "calm"
 
-def detect_mood(message):
-    greetings = ["hi", "hello", "hey", "namaste", "hola"]
-    if any(greet in message.lower() for greet in greetings):
-        return "happy"
-    elif any(q in message.lower() for q in [
-        "what", "who", "how", "where", "why", "can you", "do you know",
-        "explain", "tell me", "give me info", "i want to know",
-        "please explain", "details about", "information on", "could you",
-        "would you", "what's", "whats"
-    ]):
-        return "informative"
-    else:
-        return "calm"
+        summary = wikipedia.summary(query, sentences=2, auto_suggest=False, redirect=True)
 
-@app.route("/chat", methods=["POST"])
-def chat():
-    user_input = request.json["message"]
-    mood = detect_mood(user_input)
+        if len(summary.split()) < 10 or 'may refer to' in summary.lower():
+            raise ValueError("Too vague")
 
-    if mood == "happy":
-        reply = random.choice([
-            "Hi there! How can I help?",
-            "Hello! What would you like to know?",
-            "Hey! I'm Kris AI — ask me anything."
-        ])
-        return jsonify({"reply": reply, "mood": "happy"})
+        return "Here I found: " + summary, "informative"
 
-    elif mood == "informative":
+    except Exception:
         try:
-            topic = user_input.strip()
-            summary = wikipedia.summary(topic, sentences=2)
+            search_results = wikipedia.search(query)
+            for result in search_results:
+                if query.lower() in result.lower():
+                    try:
+                        summary = wikipedia.summary(result, sentences=2)
+                        if len(summary.split()) > 10 and "may refer to" not in summary.lower():
+                            return "Here I found: " + summary, "informative"
+                    except:
+                        continue
+            return "I couldn't find an accurate answer for that. Could you rephrase it?", "calm"
+        except:
+            return "I'm having trouble understanding that. Try asking in a different way.", "confused"
 
-            # Disambiguation or irrelevant summary checks
-            if any(phrase in summary.lower() for phrase in [
-                "may refer to", "can refer to", "list of", "disambiguation"
-            ]):
-                raise ValueError("Too ambiguous")
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-            # Check for keyword presence and length
-            if topic.lower() not in summary.lower() or len(summary) < 40:
-                raise ValueError("Not relevant enough")
+@app.route('/chat', methods=['POST'])
+def chat():
+    user_msg = request.json.get('message', '').strip()
+    if not user_msg:
+        return jsonify({'reply': "Please type something!", 'mood': 'calm'})
 
-            friendly_intro = random.choice([
-                "Sure! Here's what I found:",
-                "Of course, this might help:",
-                "Here’s something informative:",
-                "Let me explain briefly:"
-            ])
-            return jsonify({"reply": f"{friendly_intro} {summary}", "mood": "informative"})
+    lower_msg = user_msg.lower()
 
-        except Exception:
-            return jsonify({
-                "reply": "Hmm, I couldn't find accurate info on that. Could you rephrase or ask differently?",
-                "mood": "confused"
-            })
+    greetings = ['hi', 'hello', 'hey', 'good morning', 'good evening']
+    if any(word in lower_msg for word in greetings):
+        return jsonify({'reply': "Hello! I'm Kris AI. How can I assist you today?", 'mood': 'happy'})
 
-    else:
-        return jsonify({"reply": "I'm here if you need anything!", "mood": "calm"})
+    triggers = [
+        'tell me about', 'who is', 'what is', 'what are', 'give me information about',
+        'i want to know about', 'do you know about', 'please explain', 'could you explain',
+        'details about', 'information on', 'whats the', "what's the", "whats", "what's"
+    ]
+
+    if any(trigger in lower_msg for trigger in triggers) or lower_msg.endswith('?'):
+        cleaned = re.sub(r'[^\w\s]', '', user_msg)
+        summary, mood = get_clean_summary(cleaned)
+        return jsonify({'reply': summary, 'mood': mood})
+
+    return jsonify({'reply': "Interesting! Let me know if you have a question or need information on something.", 'mood': 'calm'})
+
+if __name__ == '__main__':
+    app.run(debug=True)
