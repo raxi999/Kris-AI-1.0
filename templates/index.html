@@ -1,187 +1,188 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Kris AI Chatbot</title>
+  <title>Kris AI</title>
   <style>
     body {
       margin: 0;
-      padding: 0;
-      font-family: "Segoe UI", sans-serif;
-      background-color: #e1f5fe;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #0d1b2a;
+      color: white;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
       height: 100vh;
     }
 
-    .face {
-      margin-top: 30px;
-      width: 120px;
-      height: 120px;
-      background-color: #81d4fa;
-      border-radius: 50%;
+    .header {
+      background-color: #1b263b;
+      padding: 1rem;
+      text-align: center;
+      font-size: 1.5rem;
       position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
 
-    .face::before {
-      content: "";
+    .face {
       position: absolute;
-      top: -20px;
-      left: 40px;
-      width: 30px;
+      top: 0.3rem;
+      left: 1rem;
+      width: 50px;
       height: 50px;
-      background: radial-gradient(circle at center, #1b5e20 30%, #66bb6a 60%, #b2ff59 100%);
-      border-radius: 50% 50% 50% 50%;
-      transform: rotate(-20deg);
     }
 
-    .eyes {
+    .feather {
       position: absolute;
-      top: 35%;
-      display: flex;
-      gap: 25px;
-    }
-
-    .eye {
-      width: 10px;
-      height: 10px;
-      background: #01579b;
-      border-radius: 50%;
-    }
-
-    .mouth {
-      position: absolute;
-      bottom: 30%;
-      width: 40px;
-      height: 20px;
-      border-bottom: 3px solid #01579b;
-      border-radius: 0 0 50px 50px;
+      top: -8px;
+      left: 30px;
+      width: 18px;
+      height: 18px;
+      background: #fff8dc;
+      border-radius: 50% 50% 50% 0;
+      transform: rotate(-45deg);
+      z-index: 1;
     }
 
     .chat-box {
-      margin-top: 20px;
-      width: 90%;
-      max-width: 450px;
-      background-color: #ffffff;
-      border-radius: 20px;
-      padding: 20px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .messages {
-      height: 300px;
+      flex: 1;
+      padding: 1rem;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      margin-bottom: 15px;
+      gap: 0.75rem;
     }
 
-    .msg {
-      padding: 10px 15px;
-      border-radius: 12px;
+    .bubble {
       max-width: 80%;
+      padding: 0.75rem 1rem;
+      border-radius: 1rem;
+      font-size: 1rem;
+      line-height: 1.4;
+      animation: fadeIn 0.3s ease-in-out;
     }
 
     .user {
       align-self: flex-end;
-      background-color: #c5e1a5;
+      background-color: #1e90ff;
+      color: white;
+      border-bottom-right-radius: 0;
     }
 
     .bot {
       align-self: flex-start;
-      background-color: #b3e5fc;
+      background-color: #415a77;
+      color: white;
+      border-bottom-left-radius: 0;
     }
 
     .input-area {
       display: flex;
-      gap: 10px;
+      padding: 1rem;
+      background-color: #1b263b;
+      border-top: 1px solid #415a77;
     }
 
     input[type="text"] {
       flex: 1;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #ccc;
-      font-size: 1em;
+      padding: 0.75rem 1rem;
+      border-radius: 2rem;
+      border: none;
+      font-size: 1rem;
+      outline: none;
+      background-color: #e0e1dd;
+      color: #000;
     }
 
     button {
-      background-color: #0288d1;
-      color: white;
+      margin-left: 0.5rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 2rem;
       border: none;
-      padding: 10px 15px;
-      border-radius: 10px;
-      font-size: 1em;
+      background-color: #1e90ff;
+      color: white;
+      font-size: 1rem;
       cursor: pointer;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
-  <div class="face">
-    <div class="eyes">
-      <div class="eye"></div>
-      <div class="eye"></div>
+  <div class="header">
+    <div class="face" id="face">
+      <div class="feather"></div>
+      <svg viewBox="0 0 64 64" width="50" height="50">
+        <circle cx="32" cy="32" r="30" fill="#1e90ff" />
+        <circle cx="22" cy="24" r="5" fill="#fff" />
+        <circle cx="42" cy="24" r="5" fill="#fff" />
+        <path id="mouth" d="M22 42 Q32 50 42 42" stroke="#fff" stroke-width="3" fill="none"/>
+      </svg>
     </div>
-    <div class="mouth" id="mood-mouth"></div>
+    Kris AI
   </div>
 
-  <div class="chat-box">
-    <div class="messages" id="messages"></div>
-    <div class="input-area">
-      <input type="text" id="userInput" placeholder="Type a message..." />
-      <button onclick="sendMessage()">Send</button>
-    </div>
+  <div class="chat-box" id="chatBox">
+    <!-- Messages will appear here -->
+  </div>
+
+  <div class="input-area">
+    <input type="text" id="userInput" placeholder="Ask something..." autofocus />
+    <button onclick="sendMessage()">Send</button>
   </div>
 
   <script>
-    function sendMessage() {
-      const input = document.getElementById("userInput");
-      const text = input.value.trim();
-      if (!text) return;
+    const chatBox = document.getElementById('chatBox');
+    const userInput = document.getElementById('userInput');
+    const faceMouth = document.getElementById('mouth');
 
-      const messages = document.getElementById("messages");
-
-      const userMsg = document.createElement("div");
-      userMsg.className = "msg user";
-      userMsg.textContent = text;
-      messages.appendChild(userMsg);
-
-      fetch("/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text })
-      })
-      .then(res => res.json())
-      .then(data => {
-        const botMsg = document.createElement("div");
-        botMsg.className = "msg bot";
-        botMsg.textContent = data.reply;
-        messages.appendChild(botMsg);
-
-        updateMoodFace(data.mood);
-        input.value = "";
-        messages.scrollTop = messages.scrollHeight;
-      });
+    function addMessage(text, sender) {
+      const msg = document.createElement('div');
+      msg.classList.add('bubble', sender);
+      msg.innerText = text;
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
     }
 
-    function updateMoodFace(mood) {
-      const mouth = document.getElementById("mood-mouth");
-      if (mood === "happy") {
-        mouth.style.borderBottom = "3px solid #01579b";
-      } else if (mood === "informative") {
-        mouth.style.borderBottom = "none";
-        mouth.style.borderTop = "3px solid #01579b";
-      } else {
-        mouth.style.borderBottom = "2px solid #01579b";
+    function setExpression(mood) {
+      switch (mood) {
+        case "happy":
+          faceMouth.setAttribute("d", "M22 38 Q32 45 42 38"); // smile
+          break;
+        case "excited":
+          faceMouth.setAttribute("d", "M22 36 Q32 50 42 36"); // wide smile
+          break;
+        case "thinking":
+          faceMouth.setAttribute("d", "M24 42 Q32 38 40 42"); // neutral curve
+          break;
+        case "confused":
+          faceMouth.setAttribute("d", "M22 44 Q32 36 42 44"); // confused (upside down smile)
+          break;
+        default:
+          faceMouth.setAttribute("d", "M22 42 Q32 50 42 42");
       }
     }
-  </script>
-</body>
-</html>
+
+    function detectMood(message) {
+      const msg = message.toLowerCase();
+      if (msg.includes("hi") || msg.includes("hello") || msg.includes("hey")) return "happy";
+      if (msg.includes("?") || msg.startsWith("what") || msg.startsWith("how") || msg.startsWith("who") || msg.startsWith("why")) return "excited";
+      return "thinking";
+    }
+
+    async function sendMessage() {
+      const message = userInput.value.trim();
+      if (!message) return;
+
+      const mood = detectMood(message);
+      setExpression(mood);
+      addMessage(message, 'user');
+      userInput.value = '';
+
+      try {
+        setExpression("thinking");
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json
