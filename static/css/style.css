@@ -1,108 +1,137 @@
 body {
   margin: 0;
   padding: 0;
-  background: #111;
   font-family: sans-serif;
-  color: white;
+  background: #f4f4f4;
 }
 
-.container {
-  max-width: 500px;
-  margin: 0 auto;
-  padding: 1rem;
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
 }
 
-#face {
-  width: 100px;
-  height: 100px;
+#kris-face {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  background: #39f;
-  margin: 1rem auto;
-  position: relative;
-  transition: all 0.3s ease;
+  background: radial-gradient(circle, #3498db, #2980b9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: transform 0.5s ease-in-out;
 }
 
-#face .eyes {
+#kris-face .feather {
   position: absolute;
+  top: -15px;
+  left: 35px;
   width: 10px;
-  height: 10px;
-  background: white;
-  border-radius: 50%;
-  top: 30%;
-  left: 25%;
-  box-shadow: 40px 0 white;
-}
-
-#face .mouth {
-  position: absolute;
-  width: 40px;
-  height: 20px;
-  background: white;
-  bottom: 20%;
-  left: 30%;
-  border-radius: 0 0 50px 50px;
-  transition: transform 0.3s ease;
-}
-
-#face .feather {
-  position: absolute;
-  width: 20px;
   height: 40px;
-  background: white;
-  top: -10px;
-  right: -10px;
-  border-radius: 50%;
-  transform: rotate(30deg);
+  background: linear-gradient(to bottom, green, blue, purple);
+  border-radius: 10px;
+  transform-origin: bottom;
+  animation: feather-wave 2s infinite ease-in-out;
 }
 
-.default .mouth { transform: scaleX(1); }
-.happy .mouth { transform: rotate(0deg) scale(1.2); background: white; }
-.excited .mouth { transform: scale(1.5); background: yellow; }
-.thinking .mouth { transform: rotate(15deg); background: orange; }
-.confused .mouth { transform: rotate(-20deg); background: #f55; }
-.motivation .mouth { transform: scaleY(1.4); background: #4f4; }
-.calm .mouth { transform: scaleX(0.8); background: #ccc; }
-.surprised .mouth { transform: scale(1.8); background: #ff0; }
-.sleep .mouth { transform: scaleX(0.3); background: #999; }
+@keyframes feather-wave {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(15deg); }
+}
+
+.eyes {
+  display: flex;
+  gap: 10px;
+}
+
+.eye {
+  width: 6px;
+  height: 6px;
+  background: black;
+  border-radius: 50%;
+}
+
+.mouth {
+  position: absolute;
+  bottom: 12px;
+  width: 20px;
+  height: 6px;
+  background: black;
+  border-radius: 10px;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Mood classes */
+.mood-default .mouth { width: 8px; border-radius: 50%; }
+.mood-happy .mouth { width: 20px; height: 8px; border-radius: 10px 10px 0 0; }
+.mood-thinking .mouth { width: 12px; height: 4px; border-radius: 10px; }
+.mood-confused .mouth { width: 6px; height: 6px; transform: rotate(45deg); }
+.mood-surprised .mouth { width: 12px; height: 12px; border-radius: 50%; }
+.mood-excited .mouth { width: 20px; height: 10px; border-radius: 0 0 10px 10px; }
+.mood-motivation .mouth { width: 10px; height: 10px; background: green; border-radius: 50%; }
 
 .chat-box {
-  background: #222;
-  padding: 1rem;
-  height: 300px;
+  flex: 1;
+  padding: 80px 10px 60px;
   overflow-y: auto;
-  border-radius: 8px;
-  margin-bottom: 1rem;
 }
 
-.user {
-  text-align: right;
-  margin-bottom: 0.5rem;
-  color: lightblue;
+.message {
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  max-width: 70%;
 }
 
-.bot {
-  text-align: left;
-  margin-bottom: 0.5rem;
-  color: #ff9;
+.message.user {
+  align-self: flex-end;
+  background: #d1f7c4;
+}
+
+.message.bot {
+  align-self: flex-start;
+  background: #e0e0e0;
 }
 
 .input-area {
   display: flex;
-  gap: 0.5rem;
+  padding: 10px;
+  background: white;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
 }
 
-input {
+#user-input {
   flex: 1;
-  padding: 0.5rem;
-  border: none;
-  border-radius: 8px;
-  outline: none;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 button {
-  padding: 0.5rem 1rem;
-  background: #39f;
-  color: white;
+  margin-left: 10px;
+  padding: 10px 15px;
   border: none;
-  border-radius: 8px;
+  background: #3498db;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #2980b9;
+}
+
+@media (max-height: 600px) {
+  #kris-face {
+    transform: scale(0.9) translateY(-10px);
+  }
 }
