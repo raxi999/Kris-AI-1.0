@@ -1,188 +1,76 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Kris AI</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: #0d1b2a;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-    }
+from flask import Flask, render_template, request, jsonify
+import wikipedia
+import re
 
-    .header {
-      background-color: #1b263b;
-      padding: 1rem;
-      text-align: center;
-      font-size: 1.5rem;
-      position: relative;
-    }
+app = Flask(__name__)
 
-    .face {
-      position: absolute;
-      top: 0.3rem;
-      left: 1rem;
-      width: 50px;
-      height: 50px;
-    }
+# Improve search filtering
+def get_clean_summary(query):
+    try:
+        wikipedia.set_lang("en")
+        
+        # Handle case where user sends random word like "yoo"
+        if len(query.strip()) < 3 or query.lower() in ["you", "me", "he", "she", "yoo", "yeah"]:
+            return "Could you please clarify your question a bit more?"
 
-    .feather {
-      position: absolute;
-      top: -8px;
-      left: 30px;
-      width: 18px;
-      height: 18px;
-      background: #fff8dc;
-      border-radius: 50% 50% 50% 0;
-      transform: rotate(-45deg);
-      z-index: 1;
-    }
+        # Try direct summary
+        summary = wikipedia.summary(query, sentences=2, auto_suggest=False, redirect=True)
+        
+        # Ignore too short or weird summaries
+        if len(summary.split()) < 10 or 'may refer to' in summary.lower():
+            raise ValueError("Too vague")
 
-    .chat-box {
-      flex: 1;
-      padding: 1rem;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
+        return summary
 
-    .bubble {
-      max-width: 80%;
-      padding: 0.75rem 1rem;
-      border-radius: 1rem;
-      font-size: 1rem;
-      line-height: 1.4;
-      animation: fadeIn 0.3s ease-in-out;
-    }
+    except Exception:
+        try:
+            # Try search suggestions
+            search_results = wikipedia.search(query)
+            for result in search_results:
+                if query.lower() in result.lower():
+                    try:
+                        summary = wikipedia.summary(result, sentences=2)
+                        if len(summary.split()) > 10 and "may refer to" not in summary.lower():
+                            return summary
+                    except:
+                        continue
+            return "I couldn't find an accurate answer for that. Could you rephrase it?"
+        except:
+            return "I'm having trouble understanding that. Try asking in a different way."
 
-    .user {
-      align-self: flex-end;
-      background-color: #1e90ff;
-      color: white;
-      border-bottom-right-radius: 0;
-    }
+@app.route('/')
+def index():
+    return render_template('index.html')
 
-    .bot {
-      align-self: flex-start;
-      background-color: #415a77;
-      color: white;
-      border-bottom-left-radius: 0;
-    }
+@app.route('/chat', methods=['POST'])
+def chat():
+    user_msg = request.json.get('message', '').strip()
 
-    .input-area {
-      display: flex;
-      padding: 1rem;
-      background-color: #1b263b;
-      border-top: 1px solid #415a77;
-    }
+    if not user_msg:
+        return jsonify({'reply': "Please type something!"})
 
-    input[type="text"] {
-      flex: 1;
-      padding: 0.75rem 1rem;
-      border-radius: 2rem;
-      border: none;
-      font-size: 1rem;
-      outline: none;
-      background-color: #e0e1dd;
-      color: #000;
-    }
+    # Lowercase version for trigger matching
+    lower_msg = user_msg.lower()
 
-    button {
-      margin-left: 0.5rem;
-      padding: 0.75rem 1.25rem;
-      border-radius: 2rem;
-      border: none;
-      background-color: #1e90ff;
-      color: white;
-      font-size: 1rem;
-      cursor: pointer;
-    }
+    # Greeting triggers
+    greetings = ['hi', 'hello', 'hey', 'good morning', 'good evening']
+    if any(word in lower_msg for word in greetings):
+        return jsonify({'reply': "Hello! I'm Kris AI. How can I assist you today?"})
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-  </style>
-</head>
-<body>
-  <div class="header">
-    <div class="face" id="face">
-      <div class="feather"></div>
-      <svg viewBox="0 0 64 64" width="50" height="50">
-        <circle cx="32" cy="32" r="30" fill="#1e90ff" />
-        <circle cx="22" cy="24" r="5" fill="#fff" />
-        <circle cx="42" cy="24" r="5" fill="#fff" />
-        <path id="mouth" d="M22 42 Q32 50 42 42" stroke="#fff" stroke-width="3" fill="none"/>
-      </svg>
-    </div>
-    Kris AI
-  </div>
+    # Wikipedia question triggers
+    triggers = [
+        'tell me about', 'who is', 'what is', 'what are', 'give me information about',
+        'i want to know about', 'do you know about', 'please explain', 'could you explain',
+        'details about', 'information on', 'whats the', "what's the", "whats", "what's"
+    ]
 
-  <div class="chat-box" id="chatBox">
-    <!-- Messages will appear here -->
-  </div>
+    # Check if message contains a trigger
+    if any(trigger in lower_msg for trigger in triggers) or '?' in user_msg:
+        cleaned = re.sub(r'[^\w\s]', '', user_msg)  # Remove punctuation
+        return jsonify({'reply': get_clean_summary(cleaned)})
 
-  <div class="input-area">
-    <input type="text" id="userInput" placeholder="Ask something..." autofocus />
-    <button onclick="sendMessage()">Send</button>
-  </div>
+    # Default fallback
+    return jsonify({'reply': "Interesting! Let me know if you have a question or need information on something."})
 
-  <script>
-    const chatBox = document.getElementById('chatBox');
-    const userInput = document.getElementById('userInput');
-    const faceMouth = document.getElementById('mouth');
-
-    function addMessage(text, sender) {
-      const msg = document.createElement('div');
-      msg.classList.add('bubble', sender);
-      msg.innerText = text;
-      chatBox.appendChild(msg);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-
-    function setExpression(mood) {
-      switch (mood) {
-        case "happy":
-          faceMouth.setAttribute("d", "M22 38 Q32 45 42 38"); // smile
-          break;
-        case "excited":
-          faceMouth.setAttribute("d", "M22 36 Q32 50 42 36"); // wide smile
-          break;
-        case "thinking":
-          faceMouth.setAttribute("d", "M24 42 Q32 38 40 42"); // neutral curve
-          break;
-        case "confused":
-          faceMouth.setAttribute("d", "M22 44 Q32 36 42 44"); // confused (upside down smile)
-          break;
-        default:
-          faceMouth.setAttribute("d", "M22 42 Q32 50 42 42");
-      }
-    }
-
-    function detectMood(message) {
-      const msg = message.toLowerCase();
-      if (msg.includes("hi") || msg.includes("hello") || msg.includes("hey")) return "happy";
-      if (msg.includes("?") || msg.startsWith("what") || msg.startsWith("how") || msg.startsWith("who") || msg.startsWith("why")) return "excited";
-      return "thinking";
-    }
-
-    async function sendMessage() {
-      const message = userInput.value.trim();
-      if (!message) return;
-
-      const mood = detectMood(message);
-      setExpression(mood);
-      addMessage(message, 'user');
-      userInput.value = '';
-
-      try {
-        setExpression("thinking");
-        const response = await fetch('/chat', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json
+if __name__ == '__main__':
+    app.run(debug=True)
