@@ -1,140 +1,108 @@
 body {
-  font-family: Arial, sans-serif;
-  background: #f0f8ff;
   margin: 0;
   padding: 0;
-  display: flex;
-  height: 100vh;
-  justify-content: center;
-  align-items: center;
+  background: #111;
+  font-family: sans-serif;
+  color: white;
 }
 
-#container {
-  width: 350px;
-  border: 2px solid #007acc;
-  border-radius: 10px;
-  background: white;
-  box-shadow: 0 0 10px #007acc88;
-  display: flex;
-  flex-direction: column;
-  padding: 15px;
+.container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 1rem;
 }
 
 #face {
-  width: 120px;
-  height: 120px;
-  background: #e0f0ff;
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
-  margin: 0 auto 15px auto;
+  background: #39f;
+  margin: 1rem auto;
   position: relative;
-  box-shadow: inset 0 0 10px #aaccee;
-}
-
-/* Eyes */
-.eye {
-  width: 20px;
-  height: 20px;
-  background: #333;
-  border-radius: 50%;
-  position: absolute;
-  top: 35px;
-}
-
-.eye.left {
-  left: 30px;
-}
-
-.eye.right {
-  right: 30px;
-}
-
-/* Mouth base */
-#mouth {
-  width: 60px;
-  height: 20px;
-  background: transparent;
-  border-bottom: 5px solid #333;
-  border-radius: 0 0 40px 40px;
-  position: absolute;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
   transition: all 0.3s ease;
 }
 
-/* Mouth moods */
-#mouth.happy {
-  border-bottom-color: #007acc;
-  border-radius: 0 0 40px 40px;
-  height: 20px;
-  bottom: 30px;
-}
-
-#mouth.smile {
-  border-bottom-color: #005aab;
-  height: 15px;
-  bottom: 35px;
-  border-radius: 0 0 50px 50px;
-}
-
-#mouth.confused {
-  border-bottom: none;
-  border-top: 5px solid #333;
-  border-radius: 40px 40px 0 0;
+#face .eyes {
+  position: absolute;
+  width: 10px;
   height: 10px;
-  bottom: 35px;
+  background: white;
+  border-radius: 50%;
+  top: 30%;
+  left: 25%;
+  box-shadow: 40px 0 white;
 }
 
-#mouth.neutral {
-  border-bottom-color: #333;
-  height: 5px;
-  bottom: 40px;
-  border-radius: 0;
+#face .mouth {
+  position: absolute;
+  width: 40px;
+  height: 20px;
+  background: white;
+  bottom: 20%;
+  left: 30%;
+  border-radius: 0 0 50px 50px;
+  transition: transform 0.3s ease;
 }
 
-/* Chatbox and messages */
-#chatbox {
+#face .feather {
+  position: absolute;
+  width: 20px;
+  height: 40px;
+  background: white;
+  top: -10px;
+  right: -10px;
+  border-radius: 50%;
+  transform: rotate(30deg);
+}
+
+.default .mouth { transform: scaleX(1); }
+.happy .mouth { transform: rotate(0deg) scale(1.2); background: white; }
+.excited .mouth { transform: scale(1.5); background: yellow; }
+.thinking .mouth { transform: rotate(15deg); background: orange; }
+.confused .mouth { transform: rotate(-20deg); background: #f55; }
+.motivation .mouth { transform: scaleY(1.4); background: #4f4; }
+.calm .mouth { transform: scaleX(0.8); background: #ccc; }
+.surprised .mouth { transform: scale(1.8); background: #ff0; }
+.sleep .mouth { transform: scaleX(0.3); background: #999; }
+
+.chat-box {
+  background: #222;
+  padding: 1rem;
   height: 300px;
-  border: 1px solid #ccc;
-  padding: 10px;
   overflow-y: auto;
-  margin-bottom: 10px;
-  background: #eef6fb;
-  border-radius: 5px;
+  border-radius: 8px;
+  margin-bottom: 1rem;
 }
 
-.userMsg {
+.user {
   text-align: right;
-  margin: 5px 0;
-  color: #005aab;
+  margin-bottom: 0.5rem;
+  color: lightblue;
 }
 
-.botMsg {
+.bot {
   text-align: left;
-  margin: 5px 0;
-  color: #333;
+  margin-bottom: 0.5rem;
+  color: #ff9;
 }
 
-#userInput {
-  width: calc(100% - 70px);
-  padding: 8px;
-  font-size: 16px;
-  border: 1px solid #007acc;
-  border-radius: 5px;
+.input-area {
+  display: flex;
+  gap: 0.5rem;
+}
+
+input {
+  flex: 1;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 8px;
   outline: none;
 }
 
-#sendBtn {
-  width: 60px;
-  margin-left: 5px;
-  background: #007acc;
+button {
+  padding: 0.5rem 1rem;
+  background: #39f;
   color: white;
   border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-#sendBtn:hover {
-  background: #005aab;
+  border-radius: 8px;
 }
