@@ -1,10 +1,33 @@
 from flask import Flask, render_template, request, jsonify
 import wikipedia
 import re
+import requests
+from bs4 import BeautifulSoup
 
 app = Flask(__name__)
 
-# Wikipedia summary function
+# DuckDuckGo fallback to find Wikipedia link & summary
+def get_duckduckgo_summary(query):
+    try:
+        search_url = f"https://lite.duckduckgo.com/lite/?q={query.replace(' ', '+')}"
+        res = requests.get(search_url, timeout=5)
+        soup = BeautifulSoup(res.text, "html.parser")
+        links = soup.find_all("a")
+
+        for link in links:
+            href = link.get("href")
+            if href and "wikipedia.org" in href:
+                # Extract title from URL, decode underscores
+                wiki_title = href.split("/")[-1].replace("_", " ")
+                # Try to get summary from Wikipedia using this title
+                summary, mood = get_clean_summary(wiki_title)
+                return summary, mood
+        return "I searched online but couldn't find a clear result. Could you try rephrasing?", "confused"
+    except Exception as e:
+        print(f"[DDG] Error: {e}")
+        return "Something went wrong while searching online. Please try again later.", "confused"
+
+# Wikipedia summary function with DDG fallback
 def get_clean_summary(query):
     try:
         wikipedia.set_lang("en")
@@ -28,7 +51,8 @@ def get_clean_summary(query):
                             return "Here I found: " + summary, "informative"
                     except:
                         continue
-            return "I couldn't find an accurate answer for that. Could you rephrase it?", "calm"
+            # If Wikipedia fails, try DuckDuckGo fallback
+            return get_duckduckgo_summary(query)
         except:
             return "I'm having trouble understanding that. Try asking in a different way.", "confused"
 
