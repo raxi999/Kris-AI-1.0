@@ -28,47 +28,35 @@
             position: relative;
             width: 60px;
             height: 60px;
-            background-color: #38bdf8; /* calm sky blue */
             border-radius: 50%;
+            overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
+        .face img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
         .feather {
             position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: orange;
-            top: -6px;
-            right: -6px;
-            border-radius: 40% 60% 60% 40% / 60% 40% 60% 40%;
-            transform: rotate(-15deg);
-            box-shadow: 0 0 6px 1px rgba(255, 165, 0, 0.7);
+            top: -10px;
+            right: -8px;
+            width: 30px;
+            height: 30px;
+            background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Peacock_Feather.jpg/240px-Peacock_Feather.jpg');
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%;
             animation: flutter 3s ease-in-out infinite;
         }
 
         @keyframes flutter {
             0%, 100% { transform: rotate(-15deg); }
             50% { transform: rotate(-5deg); }
-        }
-
-        .face span {
-            font-size: 28px;
-            color: #3b82f6; /* Krishna Blue */
-            animation: pulse 2.5s ease-in-out infinite;
-            user-select: none;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                transform: scale(1);
-                filter: drop-shadow(0 0 4px #3b82f6);
-            }
-            50% {
-                transform: scale(1.15);
-                filter: drop-shadow(0 0 8px #60a5fa);
-            }
         }
 
         .title {
@@ -172,7 +160,7 @@
     <header>
         <div class="face" id="krisFace">
             <div class="feather"></div>
-            <span id="krisEmoji">😐</span>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/KrishnaJanmashtami2016.jpg/240px-KrishnaJanmashtami2016.jpg" alt="Kris AI Face">
         </div>
         <div class="title">Kris AI</div>
     </header>
@@ -196,16 +184,6 @@
         const chatBox = document.getElementById('chatBox');
         const messageInput = document.getElementById('messageInput');
         const typing = document.getElementById('typing');
-        const krisEmoji = document.getElementById('krisEmoji');
-
-        const moodEmojis = {
-            happy: '😄',
-            excited: '🥳',
-            thinking: '🤔',
-            confused: '😵‍💫',
-            informative: '🧑‍💻',
-            calm: '🙂',
-        };
 
         function appendMessage(text, type) {
             const msg = document.createElement('div');
@@ -215,10 +193,6 @@
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
-        function setMood(mood) {
-            krisEmoji.textContent = moodEmojis[mood] || '😗';
-        }
-
         async function sendMessage() {
             const text = messageInput.value.trim();
             if (!text) return;
@@ -226,7 +200,6 @@
             appendMessage(text, 'user');
             messageInput.value = '';
             typing.style.display = 'block';
-            setMood('thinking');
 
             try {
                 const res = await fetch('/chat', {
@@ -238,11 +211,9 @@
                 const data = await res.json();
                 typing.style.display = 'none';
                 appendMessage(data.reply, 'kris');
-                setMood(data.mood);
             } catch (err) {
                 typing.style.display = 'none';
                 appendMessage('Sorry, something went wrong.', 'kris');
-                setMood('confused');
             }
         }
 
