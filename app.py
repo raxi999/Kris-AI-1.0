@@ -4,9 +4,9 @@ import re
 import requests
 from bs4 import BeautifulSoup
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 
-# DuckDuckGo fallback to find Wikipedia link & summary
+# DuckDuckGo fallback
 def get_duckduckgo_summary(query):
     try:
         search_url = f"https://lite.duckduckgo.com/lite/?q={query.replace(' ', '+')}"
@@ -21,32 +21,29 @@ def get_duckduckgo_summary(query):
                 summary, mood = get_clean_summary(wiki_title)
                 return summary, mood
         return "I searched online but couldn't find a clear result. Could you try rephrasing?", "confused"
-    except Exception as e:
-        print(f"[DDG] Error: {e}")
+    except Exception:
         return "Something went wrong while searching online. Please try again later.", "confused"
 
-# Wikipedia summary function with DDG fallback
+# Wikipedia summary function
 def get_clean_summary(query):
     try:
         wikipedia.set_lang("en")
-        if len(query.strip()) < 3 or query.lower() in ["you", "me", "he", "she", "yoo", "yeah"]:
+        if len(query.strip()) < 3 or query.lower() in ["you", "me", "he", "she"]:
             return "Could you please clarify your question a bit more?", "calm"
 
         summary = wikipedia.summary(query, sentences=2, auto_suggest=False, redirect=True)
         if len(summary.split()) < 10 or 'may refer to' in summary.lower():
             raise ValueError("Too vague")
-
-        return "Here I found: " + summary, "informative"
-
-    except Exception:
+        return "Here I found: " + summary, "thinking"
+    except:
         try:
-            search_results = wikipedia.search(query)
-            for result in search_results:
+            results = wikipedia.search(query)
+            for result in results:
                 if query.lower() in result.lower():
                     try:
                         summary = wikipedia.summary(result, sentences=2)
                         if len(summary.split()) > 10 and "may refer to" not in summary.lower():
-                            return "Here I found: " + summary, "informative"
+                            return "Here I found: " + summary, "thinking"
                     except:
                         continue
             return get_duckduckgo_summary(query)
@@ -55,45 +52,33 @@ def get_clean_summary(query):
 
 @app.route('/')
 def index():
-    # Serve the main chat UI
     return render_template('index.html')
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    user_msg = request.json.get('message', '').strip()
+    user_msg = request.json.get('message', '').strip().lower()
     if not user_msg:
         return jsonify({'reply': "Please type something!", 'mood': 'calm'})
 
-    lower_msg = user_msg.lower()
     greetings = ['hi', 'hello', 'hey', 'good morning', 'good evening']
-    if any(word in lower_msg for word in greetings):
+    if any(greet in user_msg for greet in greetings):
         return jsonify({'reply': "Hello! I'm Kris AI. How can I assist you today?", 'mood': 'happy'})
 
-    triggers = [
-        'tell me about', 'who is', 'what is', 'what are', 'give me information about',
-        'i want to know about', 'do you know about', 'please explain', 'could you explain',
-        'details about', 'information on', 'whats the', "what's the", 'whats', "what's",
-        'explain', 'can you explain', 'can you tell me about', 'would you explain',
-        'i need info on', 'know anything about', 'could you tell me',
-        'can you give me a summary of', 'summary of', 'background on',
-        'describe', 'definition of'
-    ]
+    motivation = ['i feel lazy', 'i need motivation', 'inspire me']
+    if any(word in user_msg for word in motivation):
+        return jsonify({'reply': "Stay strong! You're doing great. Keep pushing forward!", 'mood': 'motivation'})
 
-    for trigger in triggers:
-        if trigger in lower_msg:
-            topic = user_msg.lower().split(trigger)[-1].strip(" ?.,!")
-            if topic:
-                summary, mood = get_clean_summary(topic)
-                return jsonify({'reply': summary, 'mood': mood})
-            else:
-                return jsonify({'reply': "Please specify a topic you'd like to know about.", 'mood': 'calm'})
+    surprise = ['did you know', 'guess what']
+    if any(word in user_msg for word in surprise):
+        return jsonify({'reply': "Whoa! That’s surprising!", 'mood': 'surprised'})
 
-    if lower_msg.endswith('?'):
-        cleaned = re.sub(r'[^\w\s]', '', user_msg)
-        summary, mood = get_clean_summary(cleaned)
+    if user_msg.endswith('?') or any(trigger in user_msg for trigger in [
+        'tell me about', 'who is', 'what is', 'what are', 'explain', 'define']):
+        topic = re.sub(r'[^\w\s]', '', user_msg)
+        summary, mood = get_clean_summary(topic)
         return jsonify({'reply': summary, 'mood': mood})
 
-    return jsonify({'reply': "Interesting! Let me know if you have a question or need information on something.", 'mood': 'calm'})
+    return jsonify({'reply': "Interesting! Let me know if you have a question.", 'mood': 'default'})
 
 if __name__ == '__main__':
     app.run(debug=True)
