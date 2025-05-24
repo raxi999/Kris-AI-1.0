@@ -1,59 +1,69 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, render_template, request, jsonify
 import wikipedia
 import random
-import os
 
 app = Flask(__name__)
 
-# Mood-based greetings
-greetings = ['hi', 'hello', 'hey', 'yoo']
-basic_replies = [
-    "Hey there! I'm Kris AI, your smart assistant. Made by Yashwanth, a 15-year-old coder using just GitHub and Render.",
-    "Hello! How can I help you today?",
-    "Hi! I'm Kris AI. Ask me anything, I’m ready.",
-    "Hey! Let’s explore some knowledge together."
-]
+# Detect user mood based on input
+def detect_mood(message):
+    greetings = ["hi", "hello", "hey", "namaste", "hola"]
+    if any(greet in message.lower() for greet in greetings):
+        return "happy"
+    elif any(q in message.lower() for q in [
+        "what", "who", "how", "where", "why", "can you", "do you know",
+        "explain", "tell me", "give me info", "i want to know", "please explain",
+        "details about", "information on", "could you", "would you", "what's", "whats"
+    ]):
+        return "informative"
+    else:
+        return "calm"
 
-# Smart Wiki trigger phrases
-wiki_triggers = [
-    'tell me about', 'explain', 'who is', 'what is', 'what are',
-    'give me information about', 'i want to know about', 'do you know about',
-    'please explain', 'details about', 'information on', 'what’s', 'whats the', 'who are', 'what’s the'
-]
+# Friendly intros for Wikipedia summaries
+def custom_intro_phrases(mood):
+    if mood == "informative":
+        return random.choice([
+            "Here's what I found: ",
+            "Let me tell you in simple words: ",
+            "This might help you: ",
+            "According to my knowledge: ",
+            "I looked it up for you: ",
+            "Let me explain briefly: "
+        ])
+    else:
+        return ""
 
+# Generate bot reply
+def generate_reply(user_input):
+    mood = detect_mood(user_input)
+
+    # Greetings
+    if mood == "happy":
+        return random.choice([
+            "Hello! How can I help you today?",
+            "Hey there! What would you like to know?",
+            "Hi! Ready when you are.",
+            "Greetings! Ask me anything.",
+            "Hey! I'm Kris, your AI friend!"
+        ]), mood
+
+    # Wikipedia-based response
+    try:
+        summary = wikipedia.summary(user_input, sentences=2)
+        reply = custom_intro_phrases(mood) + summary
+        return reply, mood
+    except:
+        return "Sorry, I couldn't find anything useful on that. Try rephrasing it or ask something else.", mood
+
+# Routes
 @app.route('/')
 def home():
-    return render_template("index.html")
+    return render_template('index.html')
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    user_msg = request.json.get("message", "").lower().strip()
+    user_input = request.json['message']
+    reply, mood = generate_reply(user_input)
+    return jsonify({'reply': reply, 'mood': mood})
 
-    # Greet
-    if user_msg in greetings:
-        return jsonify({'reply': random.choice(basic_replies)})
-
-    # Owner
-    if "who is your owner" in user_msg or "who made you" in user_msg:
-        return jsonify({'reply': "I was created by Yashwanth, a smart 15-year-old from Andhra Pradesh using only GitHub and Render!"})
-
-    # Wiki-style queries
-    for phrase in wiki_triggers:
-        if phrase in user_msg:
-            try:
-                topic = user_msg.replace(phrase, '').strip()
-                summary = wikipedia.summary(topic, sentences=2)
-                return jsonify({'reply': f"Here's what I found about **{topic.title()}**:\n{summary}"})
-            except Exception:
-                return jsonify({'reply': "Sorry, I couldn’t find information on that. Try rephrasing it."})
-
-    # "What" or similar single-word confusion
-    if user_msg in ['what', 'why', 'how']:
-        return jsonify({'reply': f"Could you please clarify your question? I'm here to help!"})
-
-    return jsonify({'reply': "I'm not sure about that yet, but I'm learning! Try asking me about a famous person or topic."})
-
-# Render-compatible run
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port)
+    app.run(debug=True)
