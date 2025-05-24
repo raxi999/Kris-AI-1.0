@@ -1,76 +1,68 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Kris AI</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kris AI Chatbot</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <header>
-        <div class="face" id="krisFace">
-            <div class="feather"></div>
-            <!-- You can remove the img tag if you want full CSS face only -->
-            <!-- <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5f/KrishnaJanmashtami2016.jpg/240px-KrishnaJanmashtami2016.jpg" alt="Kris AI Face"> -->
-        </div>
-        <div class="title">Kris AI</div>
-    </header>
-
-    <div class="chat-box" id="chatBox"></div>
-
-    <div class="typing" id="typing" style="display: none;">Kris is thinking...</div>
-
-    <div class="input-box">
-        <input
-            type="text"
-            id="messageInput"
-            placeholder="Type your message..."
-            autocomplete="off"
-            autofocus
-        />
-        <button onclick="sendMessage()">Send</button>
+  <div id="container">
+    <div id="face">
+      <div class="eye left"></div>
+      <div class="eye right"></div>
+      <div id="mouth" class="neutral"></div>
     </div>
+    <div id="chatbox"></div>
+    <input type="text" id="userInput" placeholder="Type your message here..." autocomplete="off" />
+    <button id="sendBtn">Send</button>
+  </div>
 
-    <script>
-        const chatBox = document.getElementById('chatBox');
-        const messageInput = document.getElementById('messageInput');
-        const typing = document.getElementById('typing');
+  <script>
+    const sendBtn = document.getElementById('sendBtn');
+    const userInput = document.getElementById('userInput');
+    const chatbox = document.getElementById('chatbox');
+    const mouth = document.getElementById('mouth');
 
-        function appendMessage(text, type) {
-            const msg = document.createElement('div');
-            msg.className = `message ${type}`;
-            msg.textContent = text;
-            chatBox.appendChild(msg);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }
+    function addMessage(text, sender = 'bot') {
+      const msgDiv = document.createElement('div');
+      msgDiv.className = sender === 'bot' ? 'botMsg' : 'userMsg';
+      msgDiv.innerText = text;
+      chatbox.appendChild(msgDiv);
+      chatbox.scrollTop = chatbox.scrollHeight;
+    }
 
-        async function sendMessage() {
-            const text = messageInput.value.trim();
-            if (!text) return;
+    function setFaceMood(mood) {
+      mouth.className = ''; // reset classes
+      if (mood === 'happy') mouth.classList.add('happy');
+      else if (mood === 'informative') mouth.classList.add('smile');
+      else if (mood === 'confused') mouth.classList.add('confused');
+      else mouth.classList.add('neutral');
+    }
 
-            appendMessage(text, 'user');
-            messageInput.value = '';
-            typing.style.display = 'block';
+    async function sendMessage() {
+      const message = userInput.value.trim();
+      if (!message) return;
+      addMessage(message, 'user');
+      userInput.value = '';
 
-            try {
-                const res = await fetch('/chat', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ message: text }),
-                });
+      setFaceMood('neutral'); // thinking or neutral mood
 
-                const data = await res.json();
-                typing.style.display = 'none';
-                appendMessage(data.reply, 'kris');
-            } catch (err) {
-                typing.style.display = 'none';
-                appendMessage('Sorry, something went wrong.', 'kris');
-            }
-        }
+      const response = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      });
+      const data = await response.json();
 
-        messageInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-    </script>
+      addMessage(data.reply, 'bot');
+      setFaceMood(data.mood);
+    }
+
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', e => {
+      if (e.key === 'Enter') sendMessage();
+    });
+  </script>
 </body>
 </html>
