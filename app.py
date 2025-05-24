@@ -17,9 +17,7 @@ def get_duckduckgo_summary(query):
         for link in links:
             href = link.get("href")
             if href and "wikipedia.org" in href:
-                # Extract title from URL, decode underscores
                 wiki_title = href.split("/")[-1].replace("_", " ")
-                # Try to get summary from Wikipedia using this title
                 summary, mood = get_clean_summary(wiki_title)
                 return summary, mood
         return "I searched online but couldn't find a clear result. Could you try rephrasing?", "confused"
@@ -51,13 +49,13 @@ def get_clean_summary(query):
                             return "Here I found: " + summary, "informative"
                     except:
                         continue
-            # If Wikipedia fails, try DuckDuckGo fallback
             return get_duckduckgo_summary(query)
         except:
             return "I'm having trouble understanding that. Try asking in a different way.", "confused"
 
 @app.route('/')
 def index():
+    # Serve the main chat UI
     return render_template('index.html')
 
 @app.route('/chat', methods=['POST'])
@@ -71,7 +69,6 @@ def chat():
     if any(word in lower_msg for word in greetings):
         return jsonify({'reply': "Hello! I'm Kris AI. How can I assist you today?", 'mood': 'happy'})
 
-    # Extended Wikipedia trigger phrases
     triggers = [
         'tell me about', 'who is', 'what is', 'what are', 'give me information about',
         'i want to know about', 'do you know about', 'please explain', 'could you explain',
@@ -91,7 +88,6 @@ def chat():
             else:
                 return jsonify({'reply': "Please specify a topic you'd like to know about.", 'mood': 'calm'})
 
-    # Generic fallback for questions like "What is Google?"
     if lower_msg.endswith('?'):
         cleaned = re.sub(r'[^\w\s]', '', user_msg)
         summary, mood = get_clean_summary(cleaned)
