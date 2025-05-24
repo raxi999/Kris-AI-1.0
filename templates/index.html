@@ -1,76 +1,191 @@
-from flask import Flask, render_template, request, jsonify
-import wikipedia
-import re
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kris AI Chat</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f0f4f8;
+      margin: 0; padding: 0;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      justify-content: space-between;
+    }
+    header {
+      background: #007bff;
+      color: white;
+      padding: 15px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    #face-icon {
+      font-size: 2rem;
+      user-select: none;
+    }
+    #chat-container {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: white;
+      border-top: 2px solid #007bff;
+      border-bottom: 2px solid #007bff;
+    }
+    .message {
+      max-width: 70%;
+      padding: 10px 14px;
+      border-radius: 18px;
+      font-size: 1rem;
+      line-height: 1.3;
+      word-wrap: break-word;
+    }
+    .user-message {
+      align-self: flex-end;
+      background: #007bff;
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+    .bot-message {
+      align-self: flex-start;
+      background: #e1e8f5;
+      color: #222;
+      border-bottom-left-radius: 4px;
+    }
+    form {
+      display: flex;
+      padding: 10px 15px;
+      background: #fff;
+      border-top: 1px solid #ccc;
+    }
+    input[type="text"] {
+      flex-grow: 1;
+      font-size: 1rem;
+      padding: 10px 15px;
+      border: 1.5px solid #ccc;
+      border-radius: 25px;
+      outline: none;
+      transition: border-color 0.3s;
+    }
+    input[type="text"]:focus {
+      border-color: #007bff;
+    }
+    button {
+      margin-left: 10px;
+      background: #007bff;
+      color: white;
+      font-size: 1rem;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    @media (max-width: 600px) {
+      .message {
+        max-width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div id="face-icon">😗</div>
+    <div>Kris AI Chat</div>
+  </header>
 
-app = Flask(__name__)
+  <div id="chat-container"></div>
 
-# Improve search filtering
-def get_clean_summary(query):
-    try:
-        wikipedia.set_lang("en")
-        
-        # Handle case where user sends random word like "yoo"
-        if len(query.strip()) < 3 or query.lower() in ["you", "me", "he", "she", "yoo", "yeah"]:
-            return "Could you please clarify your question a bit more?"
+  <form id="chat-form">
+    <input
+      type="text"
+      id="chat-input"
+      autocomplete="off"
+      placeholder="Ask me anything..."
+      required
+      minlength="1"
+    />
+    <button type="submit">Send</button>
+  </form>
 
-        # Try direct summary
-        summary = wikipedia.summary(query, sentences=2, auto_suggest=False, redirect=True)
-        
-        # Ignore too short or weird summaries
-        if len(summary.split()) < 10 or 'may refer to' in summary.lower():
-            raise ValueError("Too vague")
+  <script>
+    const chatContainer = document.getElementById('chat-container');
+    const chatForm = document.getElementById('chat-form');
+    const chatInput = document.getElementById('chat-input');
+    const faceIcon = document.getElementById('face-icon');
 
-        return summary
+    function addMessage(text, sender) {
+      const messageDiv = document.createElement('div');
+      messageDiv.classList.add('message');
+      messageDiv.classList.add(sender === 'user' ? 'user-message' : 'bot-message');
+      messageDiv.textContent = text;
+      chatContainer.appendChild(messageDiv);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
 
-    except Exception:
-        try:
-            # Try search suggestions
-            search_results = wikipedia.search(query)
-            for result in search_results:
-                if query.lower() in result.lower():
-                    try:
-                        summary = wikipedia.summary(result, sentences=2)
-                        if len(summary.split()) > 10 and "may refer to" not in summary.lower():
-                            return summary
-                    except:
-                        continue
-            return "I couldn't find an accurate answer for that. Could you rephrase it?"
-        except:
-            return "I'm having trouble understanding that. Try asking in a different way."
+    function updateFace(mood) {
+      switch (mood) {
+        case 'happy':
+          faceIcon.textContent = '😄';
+          break;
+        case 'informative':
+          faceIcon.textContent = '🧑‍💻';
+          break;
+        case 'calm':
+          faceIcon.textContent = '🙂';
+          break;
+        case 'confused':
+          faceIcon.textContent = '😵‍💫';
+          break;
+        default:
+          faceIcon.textContent = '😗';
+      }
+    }
 
-@app.route('/')
-def index():
-    return render_template('index.html')
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const message = chatInput.value.trim();
+      if (!message) return;
 
-@app.route('/chat', methods=['POST'])
-def chat():
-    user_msg = request.json.get('message', '').strip()
+      // Show user message
+      addMessage(message, 'user');
+      chatInput.value = '';
+      updateFace('calm'); // Reset to calm while waiting
 
-    if not user_msg:
-        return jsonify({'reply': "Please type something!"})
+      try {
+        const response = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message }),
+        });
 
-    # Lowercase version for trigger matching
-    lower_msg = user_msg.lower()
+        if (!response.ok) {
+          addMessage('Sorry, something went wrong.', 'bot');
+          updateFace('confused');
+          return;
+        }
 
-    # Greeting triggers
-    greetings = ['hi', 'hello', 'hey', 'good morning', 'good evening']
-    if any(word in lower_msg for word in greetings):
-        return jsonify({'reply': "Hello! I'm Kris AI. How can I assist you today?"})
+        const data = await response.json();
 
-    # Wikipedia question triggers
-    triggers = [
-        'tell me about', 'who is', 'what is', 'what are', 'give me information about',
-        'i want to know about', 'do you know about', 'please explain', 'could you explain',
-        'details about', 'information on', 'whats the', "what's the", "whats", "what's"
-    ]
-
-    # Check if message contains a trigger
-    if any(trigger in lower_msg for trigger in triggers) or '?' in user_msg:
-        cleaned = re.sub(r'[^\w\s]', '', user_msg)  # Remove punctuation
-        return jsonify({'reply': get_clean_summary(cleaned)})
-
-    # Default fallback
-    return jsonify({'reply': "Interesting! Let me know if you have a question or need information on something."})
-
-if __name__ == '__main__':
-    app.run(debug=True)
+        addMessage(data.reply, 'bot');
+        updateFace(data.mood || 'default');
+      } catch (error) {
+        addMessage('Network error, please try again.', 'bot');
+        updateFace('confused');
+      }
+    });
+  </script>
+</body>
+</html>
