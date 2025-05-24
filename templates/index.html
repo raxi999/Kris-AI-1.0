@@ -4,52 +4,54 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kris AI</title>
-  <link rel="stylesheet" href="/static/css/style.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <div class="container">
-    <div id="face">
-      <div class="eyes"></div>
-      <div class="mouth"></div>
+  <div class="chat-container">
+    <div id="kris-face" class="mood-default">
       <div class="feather"></div>
+      <div class="eyes">
+        <div class="eye"></div>
+        <div class="eye"></div>
+      </div>
+      <div class="mouth"></div>
     </div>
+
     <div class="chat-box" id="chat-box"></div>
+
     <div class="input-area">
-      <input id="user-input" placeholder="Type something..." />
+      <input type="text" id="user-input" placeholder="Type your message..." />
       <button onclick="sendMessage()">Send</button>
     </div>
   </div>
 
   <script>
-    let face = document.getElementById("face");
-    let mouth = face.querySelector(".mouth");
-    let sleepTimer;
-
-    function changeMood(mood) {
-      face.className = mood;
-      clearTimeout(sleepTimer);
-      sleepTimer = setTimeout(() => face.className = 'sleep', 5000);
-    }
-
-    function sendMessage() {
-      const input = document.getElementById("user-input");
+    async function sendMessage() {
+      const input = document.getElementById('user-input');
       const msg = input.value.trim();
       if (!msg) return;
 
-      document.getElementById("chat-box").innerHTML += `<div class='user'>${msg}</div>`;
+      const chatBox = document.getElementById('chat-box');
+      chatBox.innerHTML += `<div class="message user">${msg}</div>`;
       input.value = "";
 
-      fetch("/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: msg })
-      })
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("chat-box").innerHTML += `<div class='bot'>${data.reply}</div>`;
-        changeMood(data.mood);
       });
+
+      const data = await response.json();
+      chatBox.innerHTML += `<div class="message bot">${data.reply}</div>`;
+      chatBox.scrollTop = chatBox.scrollHeight;
+
+      const face = document.getElementById('kris-face');
+      face.className = `mood-${data.mood}`;
     }
+
+    document.getElementById("user-input").addEventListener("keypress", function(e) {
+      if (e.key === "Enter") sendMessage();
+    });
   </script>
 </body>
 </html>
