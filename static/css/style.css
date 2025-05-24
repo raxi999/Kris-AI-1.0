@@ -1,87 +1,151 @@
-/* styles.css */
+/* static/css/style.css */
 
 body {
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #0e0e0e;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #0d1117;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
 }
 
-#header {
-  text-align: center;
-  padding: 10px;
-  background-color: #121212;
-  border-bottom: 1px solid #333;
+header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: #161b22;
+    padding: 10px 16px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
-#kris-face {
-  width: 100px;
-  height: auto;
-  margin: 10px auto;
-  display: block;
+.face {
+    position: relative;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-#chat-container {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.face img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-.user-message,
-.bot-message {
-  max-width: 75%;
-  padding: 10px;
-  border-radius: 12px;
-  font-size: 16px;
+.feather {
+    position: absolute;
+    top: -10px;
+    right: -8px;
+    width: 30px;
+    height: 30px;
+    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Peacock_Feather.jpg/240px-Peacock_Feather.jpg');
+    background-size: cover;
+    background-position: center;
+    border-radius: 50%;
+    animation: flutter 3s ease-in-out infinite;
 }
 
-.user-message {
-  align-self: flex-end;
-  background-color: #444;
+@keyframes flutter {
+    0%, 100% { transform: rotate(-15deg); }
+    50% { transform: rotate(-5deg); }
 }
 
-.bot-message {
-  align-self: flex-start;
-  background-color: #1e50f0;
-  color: white;
+.title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #93c5fd;
+    user-select: none;
 }
 
-#chat-form {
-  display: flex;
-  padding: 10px;
-  border-top: 1px solid #333;
-  background-color: #121212;
+.chat-box {
+    flex-grow: 1;
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    background-color: #010409;
 }
 
-#user-input {
-  flex: 1;
-  padding: 10px;
-  border-radius: 8px;
-  border: none;
-  background-color: #1c1c1c;
-  color: white;
+.message {
+    max-width: 80%;
+    margin-bottom: 10px;
+    padding: 10px 14px;
+    border-radius: 16px;
+    word-wrap: break-word;
+    user-select: text;
+    line-height: 1.3;
+    font-size: 1rem;
 }
 
-#send-button {
-  margin-left: 10px;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 8px;
-  background-color: #1e50f0;
-  color: white;
+.user {
+    align-self: flex-end;
+    background-color: #374151;
+    color: #e5e7eb;
 }
 
-@media (max-height: 700px) {
-  #kris-face {
-    width: 70px;
-    margin: 5px auto;
-  }
+.kris {
+    align-self: flex-start;
+    background-color: #2563eb;
+    color: #dbeafe;
+    transition: box-shadow 0.3s ease;
+}
+
+.kris:hover {
+    box-shadow: 0 0 10px 2px #3b82f6cc;
+}
+
+.input-box {
+    display: flex;
+    padding: 10px;
+    background-color: #161b22;
+    border-top: 1px solid #30363d;
+}
+
+input {
+    flex-grow: 1;
+    padding: 10px;
+    border-radius: 12px;
+    border: none;
+    background-color: #1f2937;
+    color: white;
+    font-size: 1rem;
+    outline-offset: 2px;
+}
+
+input::placeholder {
+    color: #94a3b8;
+}
+
+input:focus {
+    outline: 2px solid #2563eb;
+    background-color: #374151;
+}
+
+button {
+    background-color: #2563eb;
+    color: white;
+    border: none;
+    padding: 0 16px;
+    margin-left: 8px;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #1e40af;
+}
+
+.typing {
+    font-size: 0.9rem;
+    color: #9ca3af;
+    margin: 6px 10px;
+    font-style: italic;
+    user-select: none;
 }
