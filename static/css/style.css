@@ -1,154 +1,140 @@
-/* Body & layout */
 body {
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #0d1117;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
+  font-family: Arial, sans-serif;
+  background: #f0f8ff;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  align-items: center;
 }
 
-/* Header */
-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background-color: #161b22;
-    padding: 10px 16px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+#container {
+  width: 350px;
+  border: 2px solid #007acc;
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 0 10px #007acc88;
+  display: flex;
+  flex-direction: column;
+  padding: 15px;
 }
 
-/* Face container */
-.face {
-    position: relative;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: radial-gradient(circle at center, #2563eb, #1e40af);
-    box-shadow: 0 0 10px #2563ebcc;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
+#face {
+  width: 120px;
+  height: 120px;
+  background: #e0f0ff;
+  border-radius: 50%;
+  margin: 0 auto 15px auto;
+  position: relative;
+  box-shadow: inset 0 0 10px #aaccee;
 }
 
-/* Feather */
-.feather {
-    position: absolute;
-    top: -10px;
-    right: -8px;
-    width: 30px;
-    height: 30px;
-    background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Peacock_Feather.jpg/240px-Peacock_Feather.jpg');
-    background-size: cover;
-    background-position: center;
-    border-radius: 50%;
-    animation: flutter 3s ease-in-out infinite;
+/* Eyes */
+.eye {
+  width: 20px;
+  height: 20px;
+  background: #333;
+  border-radius: 50%;
+  position: absolute;
+  top: 35px;
 }
 
-@keyframes flutter {
-    0%, 100% { transform: rotate(-15deg); }
-    50% { transform: rotate(-5deg); }
+.eye.left {
+  left: 30px;
 }
 
-/* Title */
-.title {
-    font-size: 1.2rem;
-    font-weight: bold;
-    color: #93c5fd;
-    user-select: none;
+.eye.right {
+  right: 30px;
 }
 
-/* Chat box */
-.chat-box {
-    flex-grow: 1;
-    padding: 10px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    background-color: #010409;
+/* Mouth base */
+#mouth {
+  width: 60px;
+  height: 20px;
+  background: transparent;
+  border-bottom: 5px solid #333;
+  border-radius: 0 0 40px 40px;
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: all 0.3s ease;
 }
 
-/* Messages */
-.message {
-    max-width: 80%;
-    margin-bottom: 10px;
-    padding: 10px 14px;
-    border-radius: 16px;
-    word-wrap: break-word;
-    user-select: text;
-    line-height: 1.3;
-    font-size: 1rem;
+/* Mouth moods */
+#mouth.happy {
+  border-bottom-color: #007acc;
+  border-radius: 0 0 40px 40px;
+  height: 20px;
+  bottom: 30px;
 }
 
-.user {
-    align-self: flex-end;
-    background-color: #374151;
-    color: #e5e7eb;
+#mouth.smile {
+  border-bottom-color: #005aab;
+  height: 15px;
+  bottom: 35px;
+  border-radius: 0 0 50px 50px;
 }
 
-.kris {
-    align-self: flex-start;
-    background-color: #2563eb;
-    color: #dbeafe;
-    transition: box-shadow 0.3s ease;
+#mouth.confused {
+  border-bottom: none;
+  border-top: 5px solid #333;
+  border-radius: 40px 40px 0 0;
+  height: 10px;
+  bottom: 35px;
 }
 
-.kris:hover {
-    box-shadow: 0 0 10px 2px #3b82f6cc;
+#mouth.neutral {
+  border-bottom-color: #333;
+  height: 5px;
+  bottom: 40px;
+  border-radius: 0;
 }
 
-/* Input area */
-.input-box {
-    display: flex;
-    padding: 10px;
-    background-color: #161b22;
-    border-top: 1px solid #30363d;
+/* Chatbox and messages */
+#chatbox {
+  height: 300px;
+  border: 1px solid #ccc;
+  padding: 10px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+  background: #eef6fb;
+  border-radius: 5px;
 }
 
-input {
-    flex-grow: 1;
-    padding: 10px;
-    border-radius: 12px;
-    border: none;
-    background-color: #1f2937;
-    color: white;
-    font-size: 1rem;
-    outline-offset: 2px;
+.userMsg {
+  text-align: right;
+  margin: 5px 0;
+  color: #005aab;
 }
 
-input::placeholder {
-    color: #94a3b8;
+.botMsg {
+  text-align: left;
+  margin: 5px 0;
+  color: #333;
 }
 
-input:focus {
-    outline: 2px solid #2563eb;
-    background-color: #374151;
+#userInput {
+  width: calc(100% - 70px);
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #007acc;
+  border-radius: 5px;
+  outline: none;
 }
 
-button {
-    background-color: #2563eb;
-    color: white;
-    border: none;
-    padding: 0 16px;
-    margin-left: 8px;
-    border-radius: 12px;
-    font-weight: bold;
-    cursor: pointer;
-    user-select: none;
-    transition: background-color 0.3s ease;
+#sendBtn {
+  width: 60px;
+  margin-left: 5px;
+  background: #007acc;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
 }
 
-button:hover {
-    background-color: #1e40af;
-}
-
-/* Typing indicator */
-.typing {
-    font-size: 0.9rem;
-    color: #9ca3af;
-    margin: 6px 10px;
-    font-style: italic;
-    user-select: none;
+#sendBtn:hover {
+  background: #005aab;
 }
