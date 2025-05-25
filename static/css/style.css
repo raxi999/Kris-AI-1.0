@@ -1,133 +1,279 @@
-/* Black background and base */
-body {
-  margin: 0;
-  background-color: #121212;
-  color: #eee;
-  font-family: Arial, sans-serif;
+/* Reset & base */
+body, html {
+  margin: 0; padding: 0; height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  background: #fff;
+  color: #111;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding-top: 120px; /* leave space for face fixed top-left */
   height: 100vh;
+  overflow: hidden;
 }
 
-/* Face container fixed top-left */
-#face-container {
+/* Header with face */
+header {
+  background: #0b62ff;
+  color: white;
+  font-weight: 600;
+  padding: 10px 15px;
+  display: flex;
+  align-items: center;
   position: fixed;
-  top: 20px;
-  left: 20px;
-  width: 150px;
-  height: 150px;
-  z-index: 1000;
-  user-select: none;
+  top: 0;
+  width: 100%;
+  height: 60px;
+  box-sizing: border-box;
+  z-index: 10;
+  gap: 12px;
 }
 
-/* Face circle */
-#face {
+/* Kris AI face container */
+.face {
   position: relative;
-  width: 150px;
-  height: 150px;
-  background-color: #0a3d62; /* Blue */
+  width: 48px;
+  height: 48px;
+  background: #1e6aff; /* blue circle */
   border-radius: 50%;
-  box-shadow: 0 0 10px #0a3d62;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px rgba(30,106,255,0.5);
 }
 
 /* Eyes */
 .eye {
   position: absolute;
-  top: 50px;
-  width: 20px;
-  height: 20px;
+  top: 16px;
+  width: 8px;
+  height: 8px;
   background: black;
   border-radius: 50%;
 }
+
 .eye.left {
-  left: 40px;
+  left: 12px;
 }
 .eye.right {
-  right: 40px;
+  right: 12px;
 }
 
-/* Smile - simple upward curve */
-#smile {
+/* Mouth - default (straight line) */
+.mouth {
   position: absolute;
-  bottom: 40px;
+  bottom: 14px;
   left: 50%;
-  width: 70px;
-  height: 30px;
-  border-bottom: 4px solid black;
-  border-radius: 0 0 50px 50px;
+  width: 20px;
+  height: 6px;
+  border-bottom: 3px solid black;
+  border-radius: 0 0 12px 12px;
   transform: translateX(-50%);
 }
 
-/* Feather SVG */
-#feather {
+/* Peacock feather */
+.feather {
   position: absolute;
-  top: -40px;
+  top: -20px;
   left: 50%;
-  width: 60px;
-  height: 120px;
-  transform: translateX(-50%) rotate(-20deg);
+  width: 16px;
+  height: 36px;
+  transform: translateX(-50%);
+  animation: wave 3s ease-in-out infinite;
   pointer-events: none;
 }
+.feather:before, .feather:after {
+  content: "";
+  position: absolute;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: linear-gradient(135deg, #4caf50 30%, #008080 70%);
+}
+.feather:before {
+  width: 14px;
+  height: 32px;
+  left: 1px;
+  top: 0;
+  transform-origin: bottom center;
+  animation: featherSway 4s ease-in-out infinite;
+}
+.feather:after {
+  width: 6px;
+  height: 10px;
+  background: #ffeb3b;
+  left: 5px;
+  top: 12px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
 
-/* Feather colors - using ellipses inside SVG */
-#feather ellipse.feather-outer {
-  fill: #0b6623; /* Dark Green */
-  stroke: none;
+@keyframes wave {
+  0%, 100% { transform: translateX(-50%) rotate(0deg);}
+  50% { transform: translateX(-50%) rotate(7deg);}
 }
-#feather ellipse.feather-middle {
-  fill: #073763; /* Dark Blue */
-}
-#feather ellipse.feather-inner {
-  fill: #c49b1e; /* Gold */
+@keyframes featherSway {
+  0%, 100% { transform: rotate(0deg);}
+  50% { transform: rotate(10deg);}
 }
 
-/* Form styling */
-form#chat-form {
-  margin-top: 20px;
-  display: flex;
-  width: 100%;
-  max-width: 600px;
-  gap: 10px;
+/* Mood expressions */
+
+/* Happy: eyes bigger and mouth smiles */
+.face.happy .eye {
+  width: 10px;
+  height: 10px;
+  top: 14px;
+}
+.face.happy .mouth {
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  height: 12px;
+  border-top: 4px solid black;
+  bottom: 12px;
+  width: 24px;
+  transform: translateX(-50%);
 }
 
-form#chat-form input[type="text"] {
+/* Thinking: eyes look sideways, mouth small straight line */
+.face.thinking .eye.left {
+  left: 10px;
+  top: 16px;
+  width: 8px;
+  height: 8px;
+  background: black;
+  box-shadow: 4px 0 0 white;
+}
+.face.thinking .eye.right {
+  right: 14px;
+  top: 16px;
+  width: 8px;
+  height: 8px;
+  background: black;
+  box-shadow: -4px 0 0 white;
+}
+.face.thinking .mouth {
+  width: 12px;
+  height: 4px;
+  border-bottom: 2px solid black;
+  border-radius: 2px;
+  bottom: 16px;
+}
+
+/* Confused: crossed eyes and wavy mouth */
+.face.confused .eye.left {
+  left: 10px;
+  transform: rotate(45deg);
+  background: black;
+}
+.face.confused .eye.right {
+  right: 14px;
+  transform: rotate(-45deg);
+  background: black;
+}
+.face.confused .mouth {
+  width: 20px;
+  height: 6px;
+  border: none;
+  border-radius: 12px / 6px;
+  background:
+    radial-gradient(circle at 25% 50%, black 4px, transparent 5px),
+    radial-gradient(circle at 75% 50%, black 4px, transparent 5px);
+  background-repeat: no-repeat;
+  background-position: 0% 50%, 100% 50%;
+  bottom: 14px;
+}
+
+/* Chat container */
+#chat-container {
   flex: 1;
-  padding: 12px 15px;
-  border-radius: 25px;
-  border: none;
-  font-size: 1rem;
-  background-color: #222;
-  color: #eee;
-  outline: none;
-  box-shadow: 0 0 5px #0a3d62;
+  margin-top: 60px; /* header height */
+  padding: 10px 15px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  scroll-behavior: smooth;
 }
 
-form#chat-form button {
-  padding: 12px 25px;
-  background-color: #0a3d62;
-  color: #eee;
+/* Message bubbles */
+.message {
+  max-width: 80%;
+  padding: 10px 15px;
+  border-radius: 18px;
+  font-size: 1rem;
+  line-height: 1.3;
+  word-wrap: break-word;
+}
+
+.user-msg {
+  background: #0b62ff;
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+.ai-msg {
+  background: #f1f1f1;
+  color: #111;
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+/* Fixed input form at bottom */
+form {
+  display: flex;
+  padding: 10px;
+  border-top: 1px solid #ddd;
+  background: white;
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+input[type="text"] {
+  flex: 1;
+  padding: 10px 15px;
+  font-size: 1rem;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+input[type="text"]:focus {
+  border-color: #0b62ff;
+  box-shadow: 0 0 5px #0b62ff;
+}
+
+button {
+  background: #0b62ff;
   border: none;
-  border-radius: 25px;
-  font-weight: bold;
+  color: white;
+  font-weight: 600;
+  padding: 0 15px;
+  margin-left: 10px;
+  border-radius: 20px;
   cursor: pointer;
+  font-size: 1rem;
   transition: background-color 0.3s ease;
 }
 
-form#chat-form button:hover {
-  background-color: #07407a;
+button:hover:not(:disabled) {
+  background: #094ec7;
 }
 
-/* Response box */
-#response-box {
-  margin-top: 20px;
-  max-width: 600px;
-  background-color: #1e1e1e;
-  padding: 15px 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 8px #0a3d62;
-  color: #ddd;
-  font-size: 1.1rem;
-  line-height: 1.4;
+button:disabled {
+  background: #999;
+  cursor: not-allowed;
+}
+
+/* Responsive tweaks */
+@media (max-width: 480px) {
+  #chat-container {
+    padding: 8px 12px;
+  }
+
+  .message {
+    font-size: 0.95rem;
+  }
+
+  header {
+    font-size: 1.1rem;
+    padding: 12px;
+  }
 }
