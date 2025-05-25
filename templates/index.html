@@ -2,29 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kris AI Chat</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Kris AI</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <header>
+    <div class="header-text">
+      <h1>Kris AI</h1>
+      <p>Your intelligent, multilingual study buddy</p>
+    </div>
     <div class="face">
+      <div class="feather"></div>
       <div class="eye left"></div>
       <div class="eye right"></div>
       <div class="mouth"></div>
-      <div class="feather"></div>
     </div>
-    <h1>Kris AI</h1>
   </header>
 
   <main id="chat-container">
-    {% if response %}
-      <div class="bot-message">{{ response }}</div>
-    {% endif %}
+    <div class="message ai-msg">Hi, I'm Kris AI. How can I help you today?</div>
+    <div class="message user-msg">Tell me about the Solar System</div>
   </main>
 
-  <form action="/send" method="POST">
-    <input type="text" name="message" placeholder="Type your message..." autocomplete="off" required />
+  <form id="chat-form">
+    <input type="text" placeholder="Ask something..." />
     <button type="submit">Send</button>
   </form>
 </body>
