@@ -4,13 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Kris AI</title>
-  <link rel="stylesheet" href="static/css/style.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
   <header>
     <div class="header-text">
       <h1>Kris AI</h1>
-      <p>Your intelligent, multilingual study buddy</p>
+      <p>I am Kris, a powerful AI-powered chatbot made by a 15-year-old Yash</p>
     </div>
     <div class="face">
       <div class="feather"></div>
@@ -20,10 +20,7 @@
     </div>
   </header>
 
-  <main id="chat-container">
-    <div class="message ai-msg">Hi, I'm Kris AI. How can I help you today?</div>
-    <div class="message user-msg">Tell me about the Solar System</div>
-  </main>
+  <main id="chat-container"></main>
 
   <form id="chat-form">
     <input type="text" placeholder="Ask something..." />
