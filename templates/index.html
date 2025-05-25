@@ -1,247 +1,29 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kris AI Chat with Face</title>
-  <style>
-    /* Reset & base */
-    body, html {
-      margin: 0; padding: 0; height: 100%;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-      background: #fff;
-      color: #111;
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      overflow: hidden;
-    }
+  <title>Kris AI Chat</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body>
+  <header>
+    <div class="face">
+      <div class="eye left"></div>
+      <div class="eye right"></div>
+      <div class="mouth"></div>
+      <div class="feather"></div>
+    </div>
+    <h1>Kris AI</h1>
+  </header>
 
-    /* Header with face */
-    header {
-      background: #0b62ff;
-      color: white;
-      font-weight: 600;
-      padding: 10px 15px;
-      display: flex;
-      align-items: center;
-      position: fixed;
-      top: 0;
-      width: 100%;
-      height: 60px;
-      box-sizing: border-box;
-      z-index: 10;
-      gap: 12px;
-    }
+  <main id="chat-container">
+    <!-- Chat messages will be injected here dynamically from backend -->
+  </main>
 
-    /* Kris AI face container */
-    .face {
-      position: relative;
-      width: 48px;
-      height: 48px;
-      background: #1e6aff; /* blue circle */
-      border-radius: 50%;
-      flex-shrink: 0;
-      box-shadow: 0 0 8px rgba(30,106,255,0.5);
-    }
-
-    /* Eyes */
-    .eye {
-      position: absolute;
-      top: 16px;
-      width: 8px;
-      height: 8px;
-      background: black;
-      border-radius: 50%;
-    }
-
-    .eye.left {
-      left: 12px;
-    }
-    .eye.right {
-      right: 12px;
-    }
-
-    /* Mouth - default (straight line) */
-    .mouth {
-      position: absolute;
-      bottom: 14px;
-      left: 50%;
-      width: 20px;
-      height: 6px;
-      border-bottom: 3px solid black;
-      border-radius: 0 0 12px 12px;
-      transform: translateX(-50%);
-    }
-
-    /* Peacock feather */
-    .feather {
-      position: absolute;
-      top: -20px;
-      left: 50%;
-      width: 16px;
-      height: 36px;
-      transform: translateX(-50%);
-      animation: wave 3s ease-in-out infinite;
-      pointer-events: none;
-    }
-    .feather:before, .feather:after {
-      content: "";
-      position: absolute;
-      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-      background: linear-gradient(135deg, #4caf50 30%, #008080 70%);
-    }
-    .feather:before {
-      width: 14px;
-      height: 32px;
-      left: 1px;
-      top: 0;
-      transform-origin: bottom center;
-      animation: featherSway 4s ease-in-out infinite;
-    }
-    .feather:after {
-      width: 6px;
-      height: 10px;
-      background: #ffeb3b;
-      left: 5px;
-      top: 12px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
-
-    @keyframes wave {
-      0%, 100% { transform: translateX(-50%) rotate(0deg);}
-      50% { transform: translateX(-50%) rotate(7deg);}
-    }
-    @keyframes featherSway {
-      0%, 100% { transform: rotate(0deg);}
-      50% { transform: rotate(10deg);}
-    }
-
-    /* Mood expressions */
-
-    /* Happy: eyes bigger and mouth smiles */
-    .face.happy .eye {
-      width: 10px;
-      height: 10px;
-      top: 14px;
-    }
-    .face.happy .mouth {
-      border-bottom: none;
-      border-radius: 12px 12px 0 0;
-      height: 12px;
-      border-top: 4px solid black;
-      bottom: 12px;
-      width: 24px;
-      transform: translateX(-50%);
-    }
-
-    /* Thinking: eyes look sideways, mouth small straight line */
-    .face.thinking .eye.left {
-      left: 10px;
-      top: 16px;
-      width: 8px;
-      height: 8px;
-      background: black;
-      box-shadow: 4px 0 0 white;
-    }
-    .face.thinking .eye.right {
-      right: 14px;
-      top: 16px;
-      width: 8px;
-      height: 8px;
-      background: black;
-      box-shadow: -4px 0 0 white;
-    }
-    .face.thinking .mouth {
-      width: 12px;
-      height: 4px;
-      border-bottom: 2px solid black;
-      border-radius: 2px;
-      bottom: 16px;
-    }
-
-    /* Confused: crossed eyes and wavy mouth */
-    .face.confused .eye.left {
-      left: 10px;
-      transform: rotate(45deg);
-      background: black;
-    }
-    .face.confused .eye.right {
-      right: 14px;
-      transform: rotate(-45deg);
-      background: black;
-    }
-    .face.confused .mouth {
-      width: 20px;
-      height: 6px;
-      border: none;
-      border-radius: 12px / 6px;
-      background:
-        radial-gradient(circle at 25% 50%, black 4px, transparent 5px),
-        radial-gradient(circle at 75% 50%, black 4px, transparent 5px);
-      background-repeat: no-repeat;
-      background-position: 0% 50%, 100% 50%;
-      bottom: 14px;
-    }
-
-    /* Chat container */
-    #chat-container {
-      flex: 1;
-      margin-top: 60px; /* header height */
-      padding: 10px 15px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      scroll-behavior: smooth;
-    }
-
-    /* Message bubbles */
-    .message {
-      max-width: 80%;
-      padding: 10px 15px;
-      border-radius: 18px;
-      font-size: 1rem;
-      line-height: 1.3;
-      word-wrap: break-word;
-    }
-
-    .user-msg {
-      background: #0b62ff;
-      color: white;
-      align-self: flex-end;
-      border-bottom-right-radius: 4px;
-    }
-
-    .ai-msg {
-      background: #f1f1f1;
-      color: #111;
-      align-self: flex-start;
-      border-bottom-left-radius: 4px;
-    }
-
-    /* Fixed input form at bottom */
-    form {
-      display: flex;
-      padding: 10px;
-      border-top: 1px solid #ddd;
-      background: white;
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      padding: 10px 15px;
-      font-size: 1rem;
-      border-radius: 20px;
-      border: 1px solid #ccc;
-      outline: none;
-    }
-
-    input[type="text"]:focus {
-      border-color: #0b62ff;
-      box-shadow: 0 0 5px #0b62
+  <form action="/send" method="POST">
+    <input type="text" name="message" placeholder="Type your message..." autocomplete="off" required />
+    <button type="submit">Send</button>
+  </form>
+</body>
+</html>
