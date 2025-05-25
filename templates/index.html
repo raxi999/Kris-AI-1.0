@@ -7,29 +7,40 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
-  <!-- Header with Kris Face -->
-  <header class="header">
-    <div class="header-text">
-      <h1>Kris AI</h1>
-      <p>Your intelligent, multilingual study buddy</p>
-    </div>
+  <div class="chat-container">
+    <!-- Kris Face -->
     <div class="kris-face">
-      <div class="feather"></div>
-      <div class="eyes"></div>
-      <div class="mouth default"></div>
+      <div class="feather">
+        <div class="feather-inner"></div>
+      </div>
+      <div class="eyes">
+        <div class="eye"></div>
+        <div class="eye"></div>
+      </div>
+      <div class="mouth">
+        <div class="default-mouth"></div>
+      </div>
     </div>
-  </header>
 
-  <!-- Chat Area -->
-  <main class="chat">
-    <div class="bubble kris">Hi, I’m Kris AI. How can I help you today?</div>
-    <div class="bubble user">Tell me about the Solar System</div>
-  </main>
+    <!-- Chat Messages -->
+    <div class="chat-box" id="chat-box">
+      {% if user_input %}
+        <div class="message user">You: {{ user_input }}</div>
+      {% endif %}
+      {% if response %}
+        <div class="message bot">Kris: {{ response }}</div>
+      {% endif %}
+    </div>
 
-  <!-- Input Area -->
-  <footer class="input-box">
-    <input type="text" placeholder="Ask something..." />
-    <button>Send</button>
-  </footer>
+    <!-- Input Form -->
+    <form method="POST">
+      <input type="text" name="user_input" placeholder="Type your message..." autocomplete="off" required />
+      <button type="submit" aria-label="Send message">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="white" height="24" width="24" viewBox="0 0 24 24">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+      </button>
+    </form>
+  </div>
 </body>
 </html>
