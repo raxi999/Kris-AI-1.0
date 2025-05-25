@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <title>Kris AI</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
   <div class="chat-container">
 
-    <!-- Kris Face -->
+    <!-- Kris Face (Fixed) -->
     <div id="kris-face" class="mood-default">
       <div class="feather"></div>
       <div class="face-inner">
@@ -24,7 +24,7 @@
     <!-- Chat Area -->
     <div class="chat-box" id="chat-box"></div>
 
-    <!-- Input Area -->
+    <!-- Input Area (Fixed at Bottom) -->
     <div class="input-area">
       <input type="text" id="user-input" placeholder="Ask Kris AI..." autocomplete="off" />
       <button onclick="sendMessage()">Send</button>
@@ -58,15 +58,20 @@
       input.value = '';
       updateMood('thinking');
 
-      const res = await fetch('/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message })
-      });
+      try {
+        const res = await fetch('/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message })
+        });
 
-      const data = await res.json();
-      addMessage(data.reply, 'bot');
-      updateMood(data.mood);
+        const data = await res.json();
+        addMessage(data.reply, 'bot');
+        updateMood(data.mood);
+      } catch (error) {
+        addMessage('Something went wrong. Please try again.', 'bot');
+        updateMood('confused');
+      }
     }
   </script>
 </body>
