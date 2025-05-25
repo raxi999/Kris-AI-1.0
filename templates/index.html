@@ -18,7 +18,9 @@
   </header>
 
   <main id="chat-container">
-    <!-- Chat messages will be injected here dynamically from backend -->
+    {% if response %}
+      <div class="bot-message">{{ response }}</div>
+    {% endif %}
   </main>
 
   <form action="/send" method="POST">
