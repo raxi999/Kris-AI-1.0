@@ -15,24 +15,25 @@ body {
   box-sizing: border-box;
 }
 
+/* Kris Face */
 .kris-face {
-  width: 120px;
-  height: 120px;
+  width: 140px;
+  height: 140px;
   background-color: #4da6ff;
   border-radius: 50%;
   position: relative;
-  margin: 0 auto 15px;
-  box-shadow: 0 0 12px #4da6ff;
+  margin: 0 auto 20px;
+  box-shadow: 0 0 15px #4da6ff;
 }
 
 /* Feather */
 .feather {
-  width: 24px;
-  height: 48px;
+  width: 34px;
+  height: 68px;
   background-color: green;
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
   position: absolute;
-  top: -28px;
+  top: -38px;
   left: 50%;
   transform: translateX(-50%) rotate(-20deg);
   animation: wave 2s infinite ease-in-out;
@@ -42,8 +43,8 @@ body {
 }
 
 .feather-inner {
-  width: 12px;
-  height: 24px;
+  width: 18px;
+  height: 36px;
   background-color: darkblue;
   border-radius: 50%;
 }
@@ -57,19 +58,19 @@ body {
   }
 }
 
-/* Eyes & mouth */
+/* Eyes & Mouth */
 .eyes {
   position: absolute;
-  top: 40px;
+  top: 48px;
   width: 100%;
   display: flex;
-  justify-content: space-around;
-  padding: 0 25px;
+  justify-content: center;
+  gap: 28px;
 }
 
 .eye {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   background-color: black;
   border-radius: 50%;
   position: relative;
@@ -100,7 +101,7 @@ body {
   border-radius: 0 0 50% 50%;
 }
 
-/* Chat box */
+/* Chat Box */
 .chat-box {
   flex: 1;
   background-color: #1e1e1e;
@@ -115,9 +116,11 @@ body {
   margin: 10px 0;
   text-align: left;
   word-wrap: break-word;
+  line-height: 1.5;
+  font-size: 1rem;
 }
 
-/* Input and button */
+/* Input and Button */
 form {
   display: flex;
   gap: 10px;
