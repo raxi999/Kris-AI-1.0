@@ -1,287 +1,115 @@
-/* Global Styles */
-html, body {
+body {
   margin: 0;
-  padding: 0;
-  height: 100dvh;
-  font-family: 'Segoe UI', sans-serif;
-  background: #121212;
-  color: white;
-  overflow: hidden;
-}
-
-/* Main Container */
-.chat-container {
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: #fff;
   display: flex;
-  flex-direction: column;
-  height: 100%;
-  padding-top: 80px;
-}
-
-/* Kris Face (fixed top left and bigger) */
-#kris-face {
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  width: 150px;     /* bigger size */
-  height: 150px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #3498db, #1c5a90);
-  display: flex;
-  align-items: center;
   justify-content: center;
-  z-index: 1000;
-  transition: all 0.4s ease-in-out;
-  pointer-events: none;
-  box-shadow: 0 0 15px rgba(52, 152, 219, 0.7);
-}
-
-/* Feather as layered ovals, positioned top-right of face */
-#kris-face .feather {
-  position: absolute;
-  top: 10px;
-  right: -70px; /* moved left relative to bigger face */
-  width: 90px;
-  height: 200px;
-  transform-origin: bottom center;
-  animation: feather-wave 3s ease-in-out infinite;
-  filter: drop-shadow(0 0 2px rgba(0,0,0,0.3));
-}
-
-/* Outer oval */
-.feather::before {
-  content: "";
-  position: absolute;
-  width: 90px;
-  height: 200px;
-  background: #4b9e6f; /* dark green */
-  border-radius: 50% / 70%;
-  clip-path: polygon(
-    50% 0%, 
-    85% 10%, 
-    95% 40%, 
-    75% 80%, 
-    50% 100%, 
-    25% 80%, 
-    5% 40%, 
-    15% 10%
-  );
-  top: 0;
-  left: 0;
-  z-index: 1;
-}
-
-/* Middle oval */
-.feather::after {
-  content: "";
-  position: absolute;
-  width: 56px;
-  height: 120px;
-  background: #2c7a53; /* medium green */
-  border-radius: 50% / 70%;
-  clip-path: polygon(
-    50% 0%, 
-    80% 20%, 
-    85% 50%, 
-    55% 80%, 
-    50% 100%, 
-    40% 80%, 
-    15% 50%, 
-    20% 20%
-  );
-  top: 40px;
-  left: 17px;
-  z-index: 2;
-}
-
-/* Inner oval (use a nested div inside feather for this) */
-.feather-inner-oval {
-  position: absolute;
-  top: 70px;
-  left: 30px;
-  width: 34px;
-  height: 70px;
-  background: #e6c42d; /* golden yellow */
-  border-radius: 50% / 70%;
-  clip-path: polygon(
-    50% 0%, 
-    75% 30%, 
-    65% 60%, 
-    50% 100%, 
-    35% 60%, 
-    25% 30%
-  );
-  z-index: 3;
-  pointer-events: none;
-}
-
-/* Feather waving animation */
-@keyframes feather-wave {
-  0%, 100% {
-    transform: rotate(20deg);
-  }
-  50% {
-    transform: rotate(10deg);
-  }
-}
-
-/* Face inner layout */
-.face-inner {
-  display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  min-height: 100vh;
+}
+
+.container {
   width: 100%;
-  height: 100%;
+  max-width: 480px;
+  padding: 20px;
+}
+
+#kris-face {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 20px;
+  background: #3fa9f5;
+  border-radius: 50%;
   position: relative;
+  transition: all 0.3s ease;
 }
 
-/* Eyes */
-.eyes {
-  display: flex;
-  gap: 20px;
-  margin-top: 35px;
-}
-
-.eye {
+.feather {
   width: 20px;
+  height: 40px;
+  background: linear-gradient(to bottom right, green, blue);
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-30deg);
+  border-radius: 10px 10px 0 0;
+  animation: wave 2s infinite ease-in-out;
+}
+
+@keyframes wave {
+  0%, 100% { transform: translateX(-50%) rotate(-30deg); }
+  50% { transform: translateX(-50%) rotate(-40deg); }
+}
+
+.eyes::before,
+.eyes::after {
+  content: "";
+  width: 10px;
+  height: 10px;
+  background: black;
+  border-radius: 50%;
+  position: absolute;
+  top: 35%;
+}
+.eyes::before {
+  left: 30%;
+}
+.eyes::after {
+  right: 30%;
+}
+
+.mouth {
+  width: 40px;
   height: 20px;
   background: black;
-  border-radius: 50%;
-}
-
-/* Mouth */
-.mouth {
+  border-radius: 0 0 50% 50%;
   position: absolute;
-  bottom: 25px;
-  width: 40px;
-  height: 12px;
-  background: black;
-  border-radius: 10px;
-  transition: all 0.3s ease-in-out;
+  bottom: 30%;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
-/* Mood styles */
-.mood-default .mouth {
-  width: 20px;
-  height: 12px;
-  border-radius: 50%;
-  bottom: 30px;
-  background: black;
-}
+/* Moods */
+.mood-default .mouth { border-radius: 50%; height: 10px; }
+.mood-happy .mouth { border-radius: 0 0 50% 50%; height: 20px; }
+.mood-thinking .mouth { height: 10px; width: 10px; border-radius: 50%; }
+.mood-confused .mouth { transform: translateX(-50%) rotate(90deg); }
+.mood-surprised .mouth { width: 15px; height: 15px; border-radius: 50%; }
+.mood-motivation .mouth { border-radius: 0; background: red; height: 10px; }
 
-.mood-happy .mouth {
-  width: 60px;
-  height: 24px;
-  border-radius: 0 0 40px 40px;
-  bottom: 25px;
-  background: black;
-}
-
-.mood-thinking .mouth {
-  width: 32px;
-  height: 8px;
-  border-radius: 10px;
-  bottom: 30px;
-  background: black;
-}
-
-.mood-confused .mouth {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  bottom: 30px;
-  background: black;
-  transform: rotate(45deg);
-}
-
-.mood-surprised .mouth {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  bottom: 25px;
-  background: black;
-}
-
-.mood-excited .mouth {
-  width: 60px;
-  height: 32px;
-  border-radius: 0 0 40px 40px;
-  bottom: 25px;
-  background: black;
-}
-
-.mood-motivation .mouth {
-  width: 28px;
-  height: 28px;
-  background: #2ecc71;
-  border-radius: 50%;
-  bottom: 30px;
-}
-
-/* Chat Box */
-.chat-box {
-  flex: 1;
-  padding: 20px 10px 100px;
+#chat-box {
+  height: 300px;
   overflow-y: auto;
-  scroll-behavior: smooth;
-}
-
-/* Message Bubbles */
-.message {
-  margin: 10px 14px;
-  padding: 12px 18px;
-  border-radius: 18px;
-  max-width: 80%;
-  word-wrap: break-word;
-  font-size: 15px;
-  line-height: 1.4;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-}
-
-.message.user {
-  align-self: flex-end;
-  background: #1a73e8;
-  color: white;
-  border-bottom-right-radius: 4px;
-}
-
-.message.bot {
-  align-self: flex-start;
-  background: #2c2c2c;
-  border-bottom-left-radius: 4px;
-}
-
-/* Input Area */
-.input-area {
-  display: flex;
+  border: 1px solid #444;
   padding: 10px;
-  background: #000;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.4);
-  z-index: 9;
+  margin-bottom: 10px;
+  background: #222;
+  border-radius: 10px;
 }
 
-#user-input {
+.message {
+  margin: 5px 0;
+}
+
+form {
+  display: flex;
+  gap: 10px;
+}
+
+input[type="text"] {
   flex: 1;
   padding: 10px;
-  border: 1px solid #444;
-  border-radius: 5px;
-  background: #1e1e1e;
-  color: white;
+  border: none;
+  border-radius: 10px;
+  outline: none;
 }
 
 button {
-  margin-left: 10px;
-  padding: 10px 15px;
-  border: none;
-  background: #3498db;
+  padding: 10px 20px;
+  background: #3fa9f5;
   color: white;
-  border-radius: 5px;
+  border: none;
+  border-radius: 10px;
   cursor: pointer;
-}
-
-button:hover {
-  background: #2980b9;
 }
