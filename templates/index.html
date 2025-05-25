@@ -2,28 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kris AI</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-  <div id="kris-face" class="mood-default">
-    <div class="feather">
-      <div class="feather-inner-oval"></div>
-    </div>
-    <div class="face-inner">
-      <div class="eyes">
-        <div class="eye"></div>
-        <div class="eye"></div>
-      </div>
+  <div class="container">
+    <div id="kris-face" class="mood-default">
+      <div class="feather"></div>
+      <div class="eyes"></div>
       <div class="mouth"></div>
     </div>
-  </div>
-
-  <div class="chat-container" id="chat-container">
-    <div class="chat-box" id="chat-box"></div>
-    <form id="chat-form" class="input-area">
-      <input type="text" id="user-input" placeholder="Ask Kris AI..." autocomplete="off" />
+    <div id="chat-box"></div>
+    <form id="chat-form">
+      <input type="text" id="user-input" placeholder="Ask me anything..." autocomplete="off" required />
       <button type="submit">Send</button>
     </form>
   </div>
@@ -31,4 +23,37 @@
   <script>
     const form = document.getElementById("chat-form");
     const input = document.getElementById("user-input");
-    const chatBox = document.getElementById("chat
+    const chatBox = document.getElementById("chat-box");
+    const krisFace = document.getElementById("kris-face");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const message = input.value;
+      addMessage("You", message);
+      input.value = "";
+
+      const res = await fetch("/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message }),
+      });
+      const data = await res.json();
+      addMessage("Kris", data.response);
+      updateMood(data.mood);
+    });
+
+    function addMessage(sender, text) {
+      const div = document.createElement("div");
+      div.classList.add("message");
+      div.innerHTML = `<strong>${sender}:</strong> ${text}`;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function updateMood(mood) {
+      krisFace.className = "";
+      krisFace.classList.add(`mood-${mood}`);
+    }
+  </script>
+</body>
+</html>
