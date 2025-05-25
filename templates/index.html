@@ -1,45 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Kris AI</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta charset="UTF-8">
+    <title>Kris AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
-  <div class="header">
-    <h1>Kris AI</h1>
-    <p>Your intelligent, multilingual study buddy</p>
-    <div class="face">
-      <div class="feather"></div>
-      <div class="eyes"></div>
-      <div class="mouth"></div>
+    <div class="chat-container">
+        <div class="kris-face">
+            <div class="feather">
+                <div class="feather-inner"></div>
+            </div>
+        </div>
+
+        <div class="chat-box" id="chat-box"></div>
+
+        <form id="chat-form">
+            <input type="text" id="user-input" placeholder="Ask Kris AI..." autocomplete="off" required>
+            <button type="submit">Send</button>
+        </form>
     </div>
-  </div>
 
-  <div class="chatbox">
-    <!-- Chat messages will be dynamically loaded here -->
-  </div>
+    <script>
+        const form = document.getElementById('chat-form');
+        const input = document.getElementById('user-input');
+        const chatBox = document.getElementById('chat-box');
 
-  <div class="input-box">
-    <input type="text" id="userInput" placeholder="Ask something..." autocomplete="off">
-    <button id="sendBtn">Send</button>
-  </div>
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const message = input.value;
+            appendMessage('You', message);
+            input.value = '';
 
-  <script>
-    // Minimal dummy interaction (You can replace this later)
-    document.getElementById("sendBtn").onclick = () => {
-      const msg = document.getElementById("userInput").value;
-      if (!msg.trim()) return;
+            const response = await fetch('/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            });
 
-      const box = document.querySelector(".chatbox");
-      const userMsg = document.createElement("div");
-      userMsg.className = "user-msg";
-      userMsg.innerText = msg;
-      box.appendChild(userMsg);
+            const data = await response.json();
+            appendMessage('Kris', data.reply);
+        });
 
-      document.getElementById("userInput").value = '';
-    };
-  </script>
+        function appendMessage(sender, text) {
+            const msg = document.createElement('div');
+            msg.classList.add('message');
+            msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
+            chatBox.appendChild(msg);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+    </script>
 </body>
 </html>
