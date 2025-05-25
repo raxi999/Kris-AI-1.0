@@ -31,53 +31,53 @@ header {
   gap: 12px;
 }
 
-/* Face container - light blue circle */
+/* Face container - larger light blue circle */
 .face {
   position: relative;
-  width: 48px;
-  height: 48px;
-  background: #87cefa; /* light blue */
+  width: 72px;
+  height: 72px;
+  background: #87cefa;
   border-radius: 50%;
   flex-shrink: 0;
-  box-shadow: 0 0 8px rgba(135, 206, 250, 0.6);
+  box-shadow: 0 0 10px rgba(135, 206, 250, 0.6);
 }
 
 /* Eyes */
 .eye {
   position: absolute;
-  top: 16px;
-  width: 8px;
-  height: 8px;
+  top: 24px;
+  width: 10px;
+  height: 10px;
   background: black;
   border-radius: 50%;
 }
 
 .eye.left {
-  left: 12px;
+  left: 18px;
 }
 .eye.right {
-  right: 12px;
+  right: 18px;
 }
 
-/* Mouth - simple horizontal line */
+/* Mouth - enlarged */
 .mouth {
   position: absolute;
-  bottom: 14px;
+  bottom: 18px;
   left: 50%;
-  width: 20px;
+  width: 28px;
   height: 6px;
   border-bottom: 3px solid black;
   border-radius: 0 0 12px 12px;
   transform: translateX(-50%);
 }
 
-/* Peacock feather - on top center */
+/* Peacock feather - larger and shifted up */
 .feather {
   position: absolute;
-  top: -20px;
+  top: -28px;
   left: 50%;
-  width: 16px;
-  height: 36px;
+  width: 18px;
+  height: 42px;
   transform: translateX(-50%);
   animation: wave 3s ease-in-out infinite;
   pointer-events: none;
@@ -91,8 +91,8 @@ header {
 }
 
 .feather:before {
-  width: 14px;
-  height: 32px;
+  width: 16px;
+  height: 38px;
   left: 1px;
   top: 0;
   transform-origin: bottom center;
@@ -100,11 +100,11 @@ header {
 }
 
 .feather:after {
-  width: 6px;
-  height: 10px;
+  width: 8px;
+  height: 12px;
   background: #ffeb3b;
   left: 5px;
-  top: 12px;
+  top: 14px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
@@ -120,7 +120,7 @@ header {
 /* Main chat container - below header, scrollable */
 #chat-container {
   flex: 1;
-  margin-top: 60px; /* height of header */
+  margin-top: 60px;
   padding: 10px 15px;
   overflow-y: auto;
   display: flex;
