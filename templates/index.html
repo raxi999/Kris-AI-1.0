@@ -9,8 +9,13 @@
 <body>
   <div class="container">
     <div id="kris-face" class="mood-default">
-      <div class="feather"></div>
-      <div class="eyes"></div>
+      <div class="feather">
+        <div class="feather-inner-oval"></div>
+      </div>
+      <div class="eyes">
+        <div class="eye"></div>
+        <div class="eye"></div>
+      </div>
       <div class="mouth"></div>
     </div>
     <div id="chat-box"></div>
@@ -38,7 +43,7 @@
         body: JSON.stringify({ message }),
       });
       const data = await res.json();
-      addMessage("Kris", data.response);
+      addMessage("Kris", data.reply);  // <-- changed to data.reply
       updateMood(data.mood);
     });
 
