@@ -4,11 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Kris AI</title>
-  <link rel="stylesheet" href="/static/style.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-
-  <!-- Kris Face Always Fixed Center -->
   <div id="kris-face" class="mood-default">
     <div class="feather"></div>
     <div class="face-inner">
@@ -20,11 +18,8 @@
     </div>
   </div>
 
-  <!-- Chat Container -->
-  <div class="chat-container">
-    <div id="chat-box" class="chat-box"></div>
-
-    <!-- Input Area -->
+  <div class="chat-container" id="chat-container">
+    <div class="chat-box" id="chat-box"></div>
     <form id="chat-form" class="input-area">
       <input type="text" id="user-input" placeholder="Ask Kris AI..." autocomplete="off" />
       <button type="submit">Send</button>
@@ -59,6 +54,5 @@
       }
     });
   </script>
-
 </body>
 </html>
