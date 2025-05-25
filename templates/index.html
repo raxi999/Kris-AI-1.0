@@ -8,7 +8,7 @@
 </head>
 <body>
 
-  <!-- Kris Face (Outside chat-container for fixed position) -->
+  <!-- Kris Face (fixed, outside chat-container) -->
   <div id="kris-face" class="mood-default">
     <div class="feather"></div>
     <div class="face-inner">
@@ -20,16 +20,20 @@
     </div>
   </div>
 
-  <!-- Main Chat UI -->
+  <!-- Main Chat Layout -->
   <div class="chat-container">
+
+    <!-- Chat Messages -->
     <div class="chat-box" id="chat-box">
       <!-- Messages will appear here -->
     </div>
 
+    <!-- Input Area -->
     <div class="input-area">
       <input type="text" id="user-input" placeholder="Ask Kris AI..." autocomplete="off" />
       <button onclick="sendMessage()">Send</button>
     </div>
+
   </div>
 
   <script>
@@ -74,5 +78,6 @@
       }
     }
   </script>
+
 </body>
 </html>
