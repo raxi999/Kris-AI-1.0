@@ -19,28 +19,29 @@ header {
   background: #0b62ff;
   color: white;
   font-weight: 600;
-  padding: 10px 15px;
+  padding: 20px 15px 10px 15px;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   position: fixed;
   top: 0;
   width: 100%;
-  height: 80px;
+  height: 100px;
   box-sizing: border-box;
   z-index: 10;
-  gap: 16px;
+  gap: 14px;
 }
 
-/* Face container - bigger circle */
+/* Face container - big blue circle with feather */
 .face {
   position: relative;
-  width: 90px;
-  height: 90px;
-  background: #87cefa;
+  width: 100px;
+  height: 100px;
+  background: #87cefa; /* light blue */
   border-radius: 50%;
   flex-shrink: 0;
   margin-top: 20px;
-  box-shadow: 0 0 12px rgba(135, 206, 250, 0.6);
+  box-shadow: 0 0 20px rgba(135, 206, 250, 0.7), inset 0 0 10px rgba(255,255,255,0.3);
+  border: 2px solid rgba(0, 0, 0, 0.1);
 }
 
 /* Eyes */
@@ -52,6 +53,7 @@ header {
   background: black;
   border-radius: 50%;
 }
+
 .eye.left {
   left: 22px;
 }
@@ -62,22 +64,22 @@ header {
 /* Mouth */
 .mouth {
   position: absolute;
-  bottom: 20px;
+  bottom: 24px;
   left: 50%;
-  width: 34px;
+  width: 30px;
   height: 6px;
-  border-bottom: 3px solid black;
+  border-bottom: 4px solid black;
   border-radius: 0 0 12px 12px;
   transform: translateX(-50%);
 }
 
-/* Feather */
+/* Peacock feather */
 .feather {
   position: absolute;
-  top: -24px;
+  top: -25px;
   left: 50%;
-  width: 20px;
-  height: 48px;
+  width: 22px;
+  height: 50px;
   transform: translateX(-50%);
   animation: wave 3s ease-in-out infinite;
   pointer-events: none;
@@ -91,8 +93,8 @@ header {
 }
 
 .feather:before {
-  width: 18px;
-  height: 44px;
+  width: 20px;
+  height: 45px;
   left: 1px;
   top: 0;
   transform-origin: bottom center;
@@ -100,11 +102,11 @@ header {
 }
 
 .feather:after {
-  width: 10px;
-  height: 14px;
+  width: 8px;
+  height: 12px;
   background: #ffeb3b;
-  left: 5px;
-  top: 16px;
+  left: 7px;
+  top: 15px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
@@ -120,7 +122,7 @@ header {
 /* Chat container */
 #chat-container {
   flex: 1;
-  margin-top: 80px; /* header height */
+  margin-top: 100px;
   padding: 10px 15px;
   overflow-y: auto;
   display: flex;
@@ -156,7 +158,7 @@ header {
   border-bottom-left-radius: 4px;
 }
 
-/* Fixed input form at bottom */
+/* Input form */
 form {
   display: flex;
   padding: 10px 15px;
@@ -179,7 +181,6 @@ input[type="text"] {
   outline: none;
 }
 
-/* Input focus style */
 input[type="text"]:focus {
   border-color: #0b62ff;
   box-shadow: 0 0 5px #0b62ff;
