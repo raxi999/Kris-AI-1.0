@@ -44,18 +44,20 @@ def detect_mood(user_input):
     else:
         return 'default'
 
-@app.route('/', methods=['GET'])
+@app.route('/', methods=['GET', 'POST'])
 def home():
-    return render_template('index.html', response=None, mood="default")
+    response = None
+    mood = "default"
+    user_input = None
 
-@app.route('/send', methods=['POST'])
-def send_message():
-    user_input = request.form.get('message')
-    mood = detect_mood(user_input)
-    response = get_wikipedia_summary(user_input)
-    if not response:
-        response = get_duckduckgo_summary(user_input)
-    return render_template('index.html', response=response, mood=mood)
+    if request.method == 'POST':
+        user_input = request.form.get('user_input')
+        mood = detect_mood(user_input)
+        response = get_wikipedia_summary(user_input)
+        if not response:
+            response = get_duckduckgo_summary(user_input)
+
+    return render_template('index.html', response=response, mood=mood, user_input=user_input)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
