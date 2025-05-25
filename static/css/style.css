@@ -1,290 +1,187 @@
-/* Reset */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
+/* General body and font */
 body {
-  background: #0a1e3d;
-  color: white;
+  background-color: #000;
+  color: #eee;
+  font-family: Arial, sans-serif;
+  padding: 30px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  height: 100vh;
-  padding: 15px;
-  overflow: hidden;
 }
 
-/* Kris Face Container */
-#kris-face {
+/* Face container */
+#face {
   position: relative;
-  width: 120px;
-  height: 120px;
-  background: #2a5caa;
+  width: 150px;
+  height: 150px;
+  background: #007BFF;  /* blue circle */
   border-radius: 50%;
-  margin-bottom: 20px;
-  box-shadow: 0 0 10px #154a91;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: background 0.3s ease;
-}
-
-/* Feather */
-.feather {
-  position: absolute;
-  top: -30px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 40px;
-  height: 80px;
-  background: linear-gradient(135deg, #39a0ed 30%, #0a4a8c 70%);
-  border-radius: 20px 20px 50% 50% / 40% 40% 60% 60%;
-  filter: drop-shadow(0 0 4px #0880e1);
-  animation: feather-wave 3s infinite ease-in-out;
-  z-index: 10;
-}
-
-.feather-inner-oval {
-  position: absolute;
-  top: 20px;
-  left: 10px;
-  width: 20px;
-  height: 50px;
-  background: #68b1f3;
-  border-radius: 50% / 60%;
-  box-shadow: inset 2px 0 4px #2576ce;
-}
-
-@keyframes feather-wave {
-  0%, 100% { transform: translateX(-50%) rotate(0deg); }
-  50% { transform: translateX(-50%) rotate(10deg); }
-}
-
-/* Face inner */
-.face-inner {
-  position: relative;
-  width: 70px;
-  height: 70px;
-  background: #174882;
-  border-radius: 50%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  box-shadow: 0 0 15px #0056b3;
+  margin-bottom: 40px;
 }
 
 /* Eyes */
-.eyes {
-  display: flex;
-  justify-content: space-between;
-  width: 60%;
-  margin-bottom: 12px;
-}
-
 .eye {
-  width: 12px;
-  height: 12px;
+  position: absolute;
+  top: 45px;
+  width: 18px;
+  height: 18px;
   background: black;
   border-radius: 50%;
-  transition: background 0.3s ease;
 }
 
-/* Mouth */
-.mouth {
-  width: 28px;
-  height: 10px;
-  border-bottom: 3px solid black;
-  border-radius: 0 0 50% 50%;
+.eye.left {
+  left: 45px;
+}
+
+.eye.right {
+  right: 45px;
+}
+
+/* Smile base */
+#smile {
+  position: absolute;
+  bottom: 45px;
+  left: 50%;
+  width: 70px;
+  height: 30px;
+  border-bottom: 5px solid black;
+  border-radius: 0 0 70px 70px;
+  transform: translateX(-50%);
   transition: all 0.3s ease;
 }
 
-/* Mood Expressions */
-#mood-default .mouth {
+/* Expressions */
+
+/* happy: bigger smile */
+#face.happy #smile {
+  border-bottom-width: 7px;
   border-bottom-color: black;
+  transform: translateX(-50%) scale(1.2);
 }
 
-#mood-happy .mouth {
-  border-bottom-color: black;
-  height: 18px;
-  border-radius: 50% / 100%;
-  border-bottom-width: 4px;
-  transform: translateY(3px);
-}
-
-#mood-thinking .mouth {
-  border-bottom-color: black;
-  width: 20px;
-  border-radius: 10px;
-  border-bottom-width: 2px;
-  transform: translateY(0);
-}
-
-#mood-confused .mouth {
-  border-bottom-color: red;
-  height: 4px;
-  border-radius: 0;
+/* thinking: smaller smile, lighter color */
+#face.thinking #smile {
   border-bottom-width: 3px;
-  transform: rotate(20deg);
+  border-bottom-color: gray;
+  transform: translateX(-50%) scale(0.8);
 }
 
-#mood-surprised .mouth {
-  width: 14px;
-  height: 14px;
-  border: 3px solid black;
+/* surprised: no smile, open mouth */
+#face.surprised #smile {
+  border: none;
+  width: 25px;
+  height: 35px;
   border-radius: 50%;
-  border-bottom: none;
-  margin-top: 2px;
-  background: transparent;
-}
-
-#mood-motivation .mouth {
-  border-bottom-color: greenyellow;
-  height: 20px;
-  border-radius: 50% / 120%;
-  border-bottom-width: 4px;
-  transform: translateY(5px);
-}
-
-/* Eyes color changes for mood */
-#mood-happy .eye {
-  background: #222;
-}
-
-#mood-thinking .eye {
-  background: #444;
-}
-
-#mood-confused .eye {
-  background: darkred;
-}
-
-#mood-surprised .eye {
   background: black;
+  bottom: 40px;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
-#mood-motivation .eye {
-  background: yellowgreen;
+/* motivation: confident smile - slight glow */
+#face.motivation #smile {
+  border-bottom-width: 6px;
+  border-bottom-color: gold;
+  transform: translateX(-50%) scale(1.1);
+  box-shadow: 0 0 8px gold;
 }
 
-/* Chat container */
-.chat-container {
-  flex: 1;
-  width: 100%;
-  max-width: 400px;
+/* default: normal smile */
+#face.default #smile {
+  border-bottom-width: 5px;
+  border-bottom-color: black;
+  transform: translateX(-50%);
+}
+
+/* Feather container */
+#feather {
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  width: 60px;
+  height: 100px;
+  transform: translateX(-50%) rotate(-20deg);
+  transform-origin: bottom center;
+  animation: sway 3s ease-in-out infinite alternate;
+  cursor: default;
+}
+
+/* Feather outer oval */
+.feather-outer {
+  position: absolute;
+  width: 60px;
+  height: 100px;
+  background: linear-gradient(to bottom, green 0%, darkgreen 100%);
+  border-radius: 50% / 60%;
+  filter: drop-shadow(0 0 2px rgba(0,0,0,0.3));
+}
+
+/* Feather middle smaller oval */
+.feather-middle {
+  position: absolute;
+  top: 15px;
+  left: 12px;
+  width: 35px;
+  height: 70px;
+  background: linear-gradient(to bottom, darkblue 0%, navy 100%);
+  border-radius: 50% / 60%;
+  opacity: 0.9;
+}
+
+/* Feather inner smallest oval */
+.feather-inner {
+  position: absolute;
+  top: 30px;
+  left: 22px;
+  width: 15px;
+  height: 40px;
+  background: gold;
+  border-radius: 50% / 60%;
+  opacity: 0.8;
+}
+
+/* Feather sway animation */
+@keyframes sway {
+  0% { transform: translateX(-50%) rotate(-20deg); }
+  100% { transform: translateX(-50%) rotate(-10deg); }
+}
+
+/* Chat form styles */
+form#chat-form {
   display: flex;
-  flex-direction: column;
-  background: #15315e;
-  border-radius: 10px;
-  box-shadow: 0 0 12px #0f2a54;
-  overflow: hidden;
+  gap: 10px;
 }
 
-/* Chat box */
-.chat-box {
-  flex: 1;
-  padding: 15px;
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: #2962ff transparent;
-  background: #0d234a;
-}
-
-/* Scrollbar for Chrome, Edge, Safari */
-.chat-box::-webkit-scrollbar {
-  width: 8px;
-}
-
-.chat-box::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.chat-box::-webkit-scrollbar-thumb {
-  background-color: #2962ff;
-  border-radius: 4px;
-}
-
-/* Messages */
-.message {
-  margin-bottom: 15px;
-  max-width: 80%;
-  padding: 10px 14px;
-  border-radius: 18px;
-  line-height: 1.3;
-  font-size: 14px;
-  word-wrap: break-word;
-}
-
-.message.user {
-  background: #2962ff;
-  color: white;
-  align-self: flex-end;
-  border-bottom-right-radius: 2px;
-}
-
-.message.bot {
-  background: #1a73e8;
-  color: white;
-  align-self: flex-start;
-  border-bottom-left-radius: 2px;
-}
-
-/* Input area */
-.input-area {
-  display: flex;
-  border-top: 1px solid #2962ff;
-  background: #15315e;
+form input[type="text"] {
+  width: 350px;
   padding: 10px;
-}
-
-.input-area input {
-  flex: 1;
-  padding: 10px 15px;
-  border-radius: 20px;
+  border-radius: 5px;
   border: none;
   font-size: 16px;
-  background: #0d234a;
-  color: white;
-  outline: none;
-  transition: background 0.3s ease;
 }
 
-.input-area input::placeholder {
-  color: #7aaaff;
-}
-
-.input-area button {
-  margin-left: 10px;
+form button {
   padding: 10px 20px;
-  border-radius: 20px;
+  background-color: #007BFF;
+  color: #eee;
   border: none;
-  background: #2962ff;
-  color: white;
-  font-weight: 600;
+  border-radius: 5px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  font-weight: bold;
 }
 
-.input-area button:hover {
-  background: #1a54cc;
+form button:hover {
+  background-color: #0056b3;
 }
 
-/* Responsive */
-@media (max-width: 480px) {
-  #kris-face {
-    width: 100px;
-    height: 100px;
-  }
-
-  .feather {
-    width: 30px;
-    height: 60px;
-    top: -25px;
-  }
-
-  .chat-container {
-    max-width: 100%;
-  }
+/* Response box */
+#response-box {
+  margin-top: 30px;
+  background-color: #111;
+  padding: 15px 20px;
+  border-radius: 10px;
+  max-width: 500px;
+  color: #ddd;
+  box-shadow: 0 0 10px #222;
 }
