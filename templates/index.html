@@ -1,57 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Kris AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
   <div class="chat-container">
+
+    <!-- Kris Face -->
     <div id="kris-face" class="mood-default">
       <div class="feather"></div>
-      <div class="eyes">
-        <div class="eye"></div>
-        <div class="eye"></div>
+      <div class="face-inner">
+        <div class="eyes">
+          <div class="eye"></div>
+          <div class="eye"></div>
+        </div>
+        <div class="mouth"></div>
       </div>
-      <div class="mouth"></div>
     </div>
 
+    <!-- Chat Area -->
     <div class="chat-box" id="chat-box"></div>
 
+    <!-- Input Area -->
     <div class="input-area">
-      <input type="text" id="user-input" placeholder="Type your message..." />
+      <input type="text" id="user-input" placeholder="Ask Kris AI..." autocomplete="off" />
       <button onclick="sendMessage()">Send</button>
     </div>
+
   </div>
 
   <script>
-    async function sendMessage() {
-      const input = document.getElementById('user-input');
-      const msg = input.value.trim();
-      if (!msg) return;
+    const chatBox = document.getElementById('chat-box');
+    const krisFace = document.getElementById('kris-face');
 
-      const chatBox = document.getElementById('chat-box');
-      chatBox.innerHTML += `<div class="message user">${msg}</div>`;
-      input.value = "";
-
-      const response = await fetch('/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: msg })
-      });
-
-      const data = await response.json();
-      chatBox.innerHTML += `<div class="message bot">${data.reply}</div>`;
+    function addMessage(text, sender) {
+      const msg = document.createElement('div');
+      msg.className = `message ${sender}`;
+      msg.innerText = text;
+      chatBox.appendChild(msg);
       chatBox.scrollTop = chatBox.scrollHeight;
-
-      const face = document.getElementById('kris-face');
-      face.className = `mood-${data.mood}`;
     }
 
-    document.getElementById("user-input").addEventListener("keypress", function(e) {
-      if (e.key === "Enter") sendMessage();
-    });
+    function updateMood(mood) {
+      krisFace.className = '';
+      krisFace.classList.add(mood ? 'mood-' + mood : 'mood-default');
+    }
+
+    async function sendMessage() {
+      const input = document.getElementById('user-input');
+      const message = input.value.trim();
+      if (!message) return;
+
+      addMessage(message, 'user');
+      input.value = '';
+      updateMood('thinking');
+
+      const res = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      });
+
+      const data = await res.json();
+      addMessage(data.reply, 'bot');
+      updateMood(data.mood);
+    }
   </script>
 </body>
 </html>
