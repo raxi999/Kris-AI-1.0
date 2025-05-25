@@ -6,16 +6,18 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
-  <div id="face" class="{{ mood }}">
-    <div class="eye left"></div>
-    <div class="eye right"></div>
-    <div id="smile"></div>
+  <div id="face-container">
+    <div id="face" class="{{ mood }}">
+      <div class="eye left"></div>
+      <div class="eye right"></div>
+      <div id="smile"></div>
 
-    <!-- Feather on head -->
-    <div id="feather">
-      <div class="feather-outer"></div>
-      <div class="feather-middle"></div>
-      <div class="feather-inner"></div>
+      <!-- Feather on head -->
+      <svg id="feather" viewBox="0 0 50 100" xmlns="http://www.w3.org/2000/svg">
+        <ellipse class="feather-outer" cx="25" cy="50" rx="20" ry="45"/>
+        <ellipse class="feather-middle" cx="25" cy="50" rx="13" ry="32"/>
+        <ellipse class="feather-inner" cx="25" cy="50" rx="7" ry="16"/>
+      </svg>
     </div>
   </div>
 
