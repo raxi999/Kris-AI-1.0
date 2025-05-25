@@ -14,46 +14,43 @@ html, body {
   overflow: hidden;
 }
 
-/* Header with face and text */
+/* Header with face */
 header {
   background: #0b62ff;
   color: white;
   font-weight: 600;
-  padding: 15px 20px;
+  padding: 20px 25px 25px 25px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   position: fixed;
   top: 0;
   width: 100%;
-  height: 100px; /* bigger blue bar */
+  height: 110px; /* bigger to fit everything */
   box-sizing: border-box;
   z-index: 10;
   gap: 20px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
 }
 
-/* Text container */
+/* Header text container */
 .header-text {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  flex-grow: 1;
-  user-select: none;
 }
 
 .header-text h1 {
   font-size: 2.2rem;
-  line-height: 1.1;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .header-text p {
-  font-weight: 400;
   font-size: 1rem;
-  opacity: 0.9;
+  font-weight: 400;
+  opacity: 0.85;
 }
 
-/* Face container - bigger light blue circle */
+/* Face container - light blue circle */
 .face {
   position: relative;
   width: 80px;
@@ -61,16 +58,16 @@ header {
   background: #87cefa; /* light blue */
   border-radius: 50%;
   flex-shrink: 0;
-  box-shadow: 0 0 12px rgba(135, 206, 250, 0.8);
-  margin-bottom: 10px; /* push face down so feather won't cut */
+  box-shadow: 0 0 12px rgba(135, 206, 250, 0.6);
+  margin-bottom: 15px; /* pushed down so feather fits */
 }
 
 /* Eyes */
 .eye {
   position: absolute;
   top: 28px;
-  width: 14px;
-  height: 14px;
+  width: 12px;
+  height: 12px;
   background: black;
   border-radius: 50%;
 }
@@ -85,26 +82,25 @@ header {
 /* Mouth - simple horizontal line */
 .mouth {
   position: absolute;
-  bottom: 24px;
+  bottom: 25px;
   left: 50%;
   width: 32px;
   height: 10px;
   border-bottom: 5px solid black;
-  border-radius: 0 0 18px 18px;
+  border-radius: 0 0 20px 20px;
   transform: translateX(-50%);
 }
 
 /* Peacock feather - on top center */
 .feather {
   position: absolute;
-  top: -28px; /* moved down to avoid cutting */
+  top: -36px; /* moved down for bigger face */
   left: 50%;
   width: 28px;
   height: 64px;
   transform: translateX(-50%);
   animation: wave 3s ease-in-out infinite;
   pointer-events: none;
-  z-index: 20;
 }
 
 .feather:before, .feather:after {
@@ -115,21 +111,21 @@ header {
 }
 
 .feather:before {
-  width: 26px;
-  height: 60px;
-  left: 1px;
+  width: 24px;
+  height: 56px;
+  left: 2px;
   top: 0;
   transform-origin: bottom center;
   animation: featherSway 4s ease-in-out infinite;
 }
 
 .feather:after {
-  width: 12px;
-  height: 20px;
+  width: 10px;
+  height: 18px;
   background: #ffeb3b;
-  left: 10px;
-  top: 24px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  left: 8px;
+  top: 22px;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.25);
 }
 
 @keyframes wave {
@@ -144,12 +140,12 @@ header {
 /* Main chat container - below header, scrollable */
 #chat-container {
   flex: 1;
-  margin-top: 100px; /* height of header */
+  margin-top: 110px; /* height of header */
   padding: 15px 20px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 14px;
   scroll-behavior: smooth;
   background: #f9f9f9;
 }
@@ -183,15 +179,14 @@ header {
 /* Fixed input form at bottom */
 form {
   display: flex;
-  padding: 15px 20px;
+  padding: 12px 20px;
   border-top: 1px solid #ddd;
   background: white;
   position: fixed;
   bottom: 0;
   width: 100%;
   box-sizing: border-box;
-  gap: 12px;
-  box-shadow: 0 -2px 5px rgba(0,0,0,0.05);
+  gap: 10px;
 }
 
 /* Text input */
@@ -207,7 +202,7 @@ input[type="text"] {
 /* Input focus style */
 input[type="text"]:focus {
   border-color: #0b62ff;
-  box-shadow: 0 0 8px #0b62ff;
+  box-shadow: 0 0 7px #0b62ff;
 }
 
 /* Send button */
@@ -230,52 +225,49 @@ button:hover {
 @media (max-width: 600px) {
   header {
     height: 120px;
-    padding: 15px 12px;
-    gap: 15px;
+    padding: 20px 15px 20px 15px;
   }
   .header-text h1 {
     font-size: 1.8rem;
   }
   .header-text p {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
   }
   .face {
-    width: 70px;
-    height: 70px;
+    width: 60px;
+    height: 60px;
+    margin-bottom: 12px;
   }
   .eye {
-    width: 12px;
-    height: 12px;
-    top: 25px;
+    width: 9px;
+    height: 9px;
+    top: 20px;
   }
   .eye.left {
-    left: 20px;
+    left: 17px;
   }
   .eye.right {
-    right: 20px;
+    right: 17px;
   }
   .mouth {
-    width: 28px;
-    height: 8px;
-    bottom: 20px;
+    width: 24px;
+    height: 7px;
+    bottom: 18px;
   }
   .feather {
-    width: 24px;
-    height: 56px;
-    top: -24px;
+    width: 20px;
+    height: 44px;
+    top: -25px;
   }
   #chat-container {
     margin-top: 120px;
-    padding: 12px 15px;
-  }
-  form {
-    padding: 12px 15px;
-    gap: 10px;
+    padding: 10px 12px;
   }
   input[type="text"] {
-    font-size: 0.95rem;
+    font-size: 0.9rem;
+    padding: 10px 14px;
   }
   button {
-    padding: 0 16px;
+    padding: 0 14px;
   }
 }
