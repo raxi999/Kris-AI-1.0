@@ -1,7 +1,6 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request
 import wikipedia
 import requests
-import re
 
 app = Flask(__name__)
 
@@ -9,7 +8,6 @@ def get_wikipedia_summary(query):
     try:
         wikipedia.set_lang("en")
         summary = wikipedia.summary(query, sentences=2)
-        # Avoid unwanted "may refer to" or list-based summaries
         if "may refer to" in summary.lower() or len(summary) < 40:
             return None
         return summary
@@ -45,20 +43,17 @@ def detect_mood(user_input):
     else:
         return 'default'
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def home():
-    return render_template('index.html')
-
-@app.route('/chat', methods=['POST'])
-def chat():
-    user_input = request.json['message']
-    mood = detect_mood(user_input)
-
-    response = get_wikipedia_summary(user_input)
-    if not response:
-        response = get_duckduckgo_summary(user_input)
-
-    return jsonify({'response': response, 'mood': mood})
+    response = None
+    mood = "default"
+    if request.method == 'POST':
+        user_input = request.form.get('message')
+        mood = detect_mood(user_input)
+        response = get_wikipedia_summary(user_input)
+        if not response:
+            response = get_duckduckgo_summary(user_input)
+    return render_template('index.html', response=response, mood=mood)
 
 if __name__ == '__main__':
     app.run(debug=True)
