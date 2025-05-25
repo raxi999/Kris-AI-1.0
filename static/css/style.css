@@ -1,112 +1,93 @@
 body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background: #fdfdfd;
+    background-color: #121212;
+    color: white;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
-.header {
-  background-color: #007aff;
-  color: white;
-  padding: 1em;
-  text-align: center;
-  position: relative;
+.chat-container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
 }
 
-.face {
-  position: absolute;
-  top: 1em;
-  right: 1em;
-  width: 60px;
-  height: 60px;
-  background: #80d6ff;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.kris-face {
+    width: 120px;
+    height: 120px;
+    background-color: #4da6ff;
+    border-radius: 50%;
+    position: relative;
+    margin: 0 auto 15px;
+    box-shadow: 0 0 15px #4da6ff;
 }
 
+/* Feather */
 .feather {
-  position: absolute;
-  top: -10px;
-  right: 10px;
-  width: 12px;
-  height: 25px;
-  background: linear-gradient(to top right, green, yellow);
-  border-radius: 50% 50% 0 0;
-  transform: rotate(-20deg);
-  z-index: 1;
+    width: 24px;
+    height: 48px;
+    background-color: green;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    position: absolute;
+    top: -28px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-20deg);
+    animation: wave 2s infinite ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.eyes::before, .eyes::after {
-  content: "";
-  position: absolute;
-  background: black;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  top: 40%;
+.feather-inner {
+    width: 12px;
+    height: 24px;
+    background-color: darkblue;
+    border-radius: 50%;
 }
 
-.eyes::before {
-  left: 20px;
+@keyframes wave {
+    0%, 100% {
+        transform: translateX(-50%) rotate(-20deg);
+    }
+    50% {
+        transform: translateX(-50%) rotate(-10deg);
+    }
 }
 
-.eyes::after {
-  right: 20px;
+.chat-box {
+    background: #1e1e1e;
+    padding: 10px;
+    border-radius: 10px;
+    height: 300px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+    box-shadow: 0 0 10px #333;
 }
 
-.mouth {
-  position: absolute;
-  bottom: 18%;
-  width: 12px;
-  height: 3px;
-  background: black;
-  border-radius: 3px;
+.message {
+    margin: 8px 0;
+    text-align: left;
 }
 
-.chatbox {
-  padding: 1em;
-  max-height: 70vh;
-  overflow-y: auto;
-}
-
-.user-msg {
-  background-color: #007aff;
-  color: white;
-  padding: 0.6em 1em;
-  margin: 0.5em 0;
-  border-radius: 20px;
-  max-width: 80%;
-  align-self: flex-end;
-  margin-left: auto;
-}
-
-.input-box {
-  display: flex;
-  padding: 1em;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  background: white;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+form {
+    display: flex;
+    gap: 10px;
 }
 
 input[type="text"] {
-  flex: 1;
-  padding: 0.6em;
-  font-size: 1em;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-  outline: none;
+    flex: 1;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    outline: none;
 }
 
-button#sendBtn {
-  margin-left: 0.5em;
-  padding: 0.6em 1em;
-  background: #007aff;
-  color: white;
-  border: none;
-  border-radius: 20px;
-  font-weight: bold;
-  cursor: pointer;
+button {
+    padding: 10px 15px;
+    background-color: #4da6ff;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    cursor: pointer;
 }
