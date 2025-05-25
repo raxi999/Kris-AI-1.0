@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 import wikipedia
 import requests
+import os
 
 app = Flask(__name__)
 
@@ -43,17 +44,19 @@ def detect_mood(user_input):
     else:
         return 'default'
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def home():
-    response = None
-    mood = "default"
-    if request.method == 'POST':
-        user_input = request.form.get('message')
-        mood = detect_mood(user_input)
-        response = get_wikipedia_summary(user_input)
-        if not response:
-            response = get_duckduckgo_summary(user_input)
+    return render_template('index.html', response=None, mood="default")
+
+@app.route('/send', methods=['POST'])
+def send_message():
+    user_input = request.form.get('message')
+    mood = detect_mood(user_input)
+    response = get_wikipedia_summary(user_input)
+    if not response:
+        response = get_duckduckgo_summary(user_input)
     return render_template('index.html', response=response, mood=mood)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
