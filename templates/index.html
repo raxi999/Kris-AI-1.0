@@ -1,34 +1,137 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Kris AI</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
-    <div class="container">
-        <div class="face-container">
-            <div class="kris-face {{ mood }}">
-                <div class="feather">
-                    <div></div>
-                </div>
-                <div class="eye left"></div>
-                <div class="eye right"></div>
-                <div class="mouth"></div>
-            </div>
-        </div>
+body {
+    margin: 0;
+    padding: 0;
+    font-family: "Segoe UI", sans-serif;
+    background-color: #f7f7f8;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 
-        <div class="chat-box">
-            {% if response %}
-                <div class="user-message"><strong>You:</strong> {{ request.form.get('message') }}</div>
-                <div class="bot-message"><strong>Kris:</strong> {{ response }}</div>
-            {% endif %}
-        </div>
+.face-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+}
 
-        <form method="POST" action="/send" class="chat-form">
-            <input type="text" name="message" placeholder="Ask Kris AI..." required>
-            <button type="submit">Send</button>
-        </form>
-    </div>
-</body>
-</html>
+#kris-face {
+    width: 70px;
+    height: 70px;
+    background-color: #4da6ff;
+    border-radius: 50%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.feather {
+    width: 20px;
+    height: 50px;
+    background: linear-gradient(to bottom, #00c6ff, #0072ff);
+    position: absolute;
+    top: -20px;
+    left: 40%;
+    border-radius: 10px 10px 0 0;
+    transform: rotate(-20deg);
+    animation: wave 2s infinite ease-in-out;
+}
+
+@keyframes wave {
+    0%, 100% { transform: rotate(-20deg); }
+    50% { transform: rotate(-10deg); }
+}
+
+.eyes {
+    width: 10px;
+    height: 10px;
+    background-color: black;
+    border-radius: 50%;
+    position: absolute;
+    top: 22px;
+    left: 18px;
+}
+
+.eyes::after {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background-color: black;
+    border-radius: 50%;
+    position: absolute;
+    left: 24px;
+}
+
+.mouth {
+    width: 20px;
+    height: 8px;
+    border-bottom: 3px solid black;
+    position: absolute;
+    top: 45px;
+    left: 25px;
+    border-radius: 0 0 10px 10px;
+}
+
+.chat-container {
+    margin-top: 100px;
+    max-width: 700px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 10px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+#chat-box {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 10px;
+    height: 60vh;
+}
+
+.message {
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    max-width: 80%;
+    word-wrap: break-word;
+    line-height: 1.4;
+}
+
+.message.user {
+    background-color: #dcf8c6;
+    align-self: flex-end;
+}
+
+.message.kris {
+    background-color: #e3e3e3;
+    align-self: flex-start;
+}
+
+#chat-form {
+    display: flex;
+    margin-top: 10px;
+}
+
+#user-input {
+    flex-grow: 1;
+    padding: 10px;
+    border-radius: 8px 0 0 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+#chat-form button {
+    padding: 10px 20px;
+    background-color: #4da6ff;
+    color: white;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
+}
