@@ -1,84 +1,64 @@
 from flask import Flask, render_template, request, jsonify
 import wikipedia
-import re
 import requests
-from bs4 import BeautifulSoup
+import re
 
-app = Flask(__name__, static_url_path='/static')
+app = Flask(__name__)
 
-# DuckDuckGo fallback
-def get_duckduckgo_summary(query):
-    try:
-        search_url = f"https://lite.duckduckgo.com/lite/?q={query.replace(' ', '+')}"
-        res = requests.get(search_url, timeout=5)
-        soup = BeautifulSoup(res.text, "html.parser")
-        links = soup.find_all("a")
-
-        for link in links:
-            href = link.get("href")
-            if href and "wikipedia.org" in href:
-                wiki_title = href.split("/")[-1].replace("_", " ")
-                summary, mood = get_clean_summary(wiki_title)
-                return summary, mood
-        return "I searched online but couldn't find a clear result. Could you try rephrasing?", "confused"
-    except Exception:
-        return "Something went wrong while searching online. Please try again later.", "confused"
-
-# Wikipedia summary function
-def get_clean_summary(query):
+def get_wikipedia_summary(query):
     try:
         wikipedia.set_lang("en")
-        if len(query.strip()) < 3 or query.lower() in ["you", "me", "he", "she"]:
-            return "Could you please clarify your question a bit more?", "calm"
-
-        summary = wikipedia.summary(query, sentences=2, auto_suggest=False, redirect=True)
-        if len(summary.split()) < 10 or 'may refer to' in summary.lower():
-            raise ValueError("Too vague")
-        return "Here I found: " + summary, "thinking"
+        summary = wikipedia.summary(query, sentences=2)
+        # Avoid unwanted "may refer to" or list-based summaries
+        if "may refer to" in summary.lower() or len(summary) < 40:
+            return None
+        return summary
     except:
-        try:
-            results = wikipedia.search(query)
-            for result in results:
-                if query.lower() in result.lower():
-                    try:
-                        summary = wikipedia.summary(result, sentences=2)
-                        if len(summary.split()) > 10 and "may refer to" not in summary.lower():
-                            return "Here I found: " + summary, "thinking"
-                    except:
-                        continue
-            return get_duckduckgo_summary(query)
-        except:
-            return "I'm having trouble understanding that. Try asking in a different way.", "confused"
+        return None
+
+def get_duckduckgo_summary(query):
+    try:
+        url = f"https://api.duckduckgo.com/?q={query}&format=json&no_html=1"
+        res = requests.get(url)
+        data = res.json()
+        if data.get("Abstract"):
+            return data["Abstract"]
+        return "Sorry, I couldn’t find information on that topic."
+    except:
+        return "Sorry, something went wrong while searching."
+
+def detect_mood(user_input):
+    user_input = user_input.lower()
+    greetings = ['hi', 'hello', 'hey']
+    motivation = ['lazy', 'tired', 'no mood', 'bore', 'boring']
+    surprised = ['what!', 'no way', 'really?', 'unbelievable']
+    question_words = ['what is', 'who is', 'tell me about', 'explain', 'give info', 'do you know', 'please explain']
+
+    if any(word in user_input for word in greetings):
+        return 'happy'
+    elif any(word in user_input for word in motivation):
+        return 'motivation'
+    elif any(word in user_input for word in surprised):
+        return 'surprised'
+    elif any(q in user_input for q in question_words) or user_input.endswith('?'):
+        return 'thinking'
+    else:
+        return 'default'
 
 @app.route('/')
-def index():
+def home():
     return render_template('index.html')
 
 @app.route('/chat', methods=['POST'])
 def chat():
-    user_msg = request.json.get('message', '').strip().lower()
-    if not user_msg:
-        return jsonify({'reply': "Please type something!", 'mood': 'calm'})
+    user_input = request.json['message']
+    mood = detect_mood(user_input)
 
-    greetings = ['hi', 'hello', 'hey', 'good morning', 'good evening']
-    if any(greet in user_msg for greet in greetings):
-        return jsonify({'reply': "Hello! I'm Kris AI. How can I assist you today?", 'mood': 'happy'})
+    response = get_wikipedia_summary(user_input)
+    if not response:
+        response = get_duckduckgo_summary(user_input)
 
-    motivation = ['i feel lazy', 'i need motivation', 'inspire me']
-    if any(word in user_msg for word in motivation):
-        return jsonify({'reply': "Stay strong! You're doing great. Keep pushing forward!", 'mood': 'motivation'})
-
-    surprise = ['did you know', 'guess what']
-    if any(word in user_msg for word in surprise):
-        return jsonify({'reply': "Whoa! That’s surprising!", 'mood': 'surprised'})
-
-    if user_msg.endswith('?') or any(trigger in user_msg for trigger in [
-        'tell me about', 'who is', 'what is', 'what are', 'explain', 'define']):
-        topic = re.sub(r'[^\w\s]', '', user_msg)
-        summary, mood = get_clean_summary(topic)
-        return jsonify({'reply': summary, 'mood': mood})
-
-    return jsonify({'reply': "Interesting! Let me know if you have a question.", 'mood': 'default'})
+    return jsonify({'response': response, 'mood': mood})
 
 if __name__ == '__main__':
     app.run(debug=True)
