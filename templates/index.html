@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Kris AI</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <!-- Correct way to link CSS in Flask -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
   <header>
@@ -20,7 +21,9 @@
     </div>
   </header>
 
-  <main id="chat-container"></main>
+  <main id="chat-container">
+    <!-- Leave empty if you don’t want default messages -->
+  </main>
 
   <form id="chat-form">
     <input type="text" placeholder="Ask something..." />
