@@ -1,60 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kris AI</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
   <div class="chat-container">
+    <!-- Kris Face -->
     <div class="kris-face">
       <div class="feather">
         <div class="feather-inner"></div>
       </div>
       <div class="eyes">
-        <div class="eye left"></div>
-        <div class="eye right"></div>
+        <div class="eye"></div>
+        <div class="eye"></div>
       </div>
-      <div class="mouth default-mouth"></div>
+      <div class="mouth">
+        <div class="default-mouth"></div>
+      </div>
     </div>
 
-    <div class="chat-box" id="chat-box"></div>
+    <!-- Chat Messages -->
+    <div class="chat-box" id="chat-box">
+      {% for message in messages %}
+        <div class="message">{{ message }}</div>
+      {% endfor %}
+    </div>
 
-    <form id="chat-form">
-      <input type="text" id="user-input" placeholder="Ask Kris AI..." autocomplete="off" required>
+    <!-- Input Form -->
+    <form method="POST">
+      <input type="text" name="user_input" placeholder="Type your message..." autocomplete="off" required />
       <button type="submit">Send</button>
     </form>
   </div>
-
-  <script>
-    const form = document.getElementById('chat-form');
-    const input = document.getElementById('user-input');
-    const chatBox = document.getElementById('chat-box');
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const message = input.value;
-      appendMessage('You', message);
-      input.value = '';
-
-      const response = await fetch('/chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message })
-      });
-
-      const data = await response.json();
-      appendMessage('Kris', data.reply);
-    });
-
-    function appendMessage(sender, text) {
-      const msg = document.createElement('div');
-      msg.classList.add('message');
-      msg.innerHTML = `<strong>${sender}:</strong> ${text}`;
-      chatBox.appendChild(msg);
-      chatBox.scrollTop = chatBox.scrollHeight;
-    }
-  </script>
 </body>
 </html>
