@@ -1,147 +1,137 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: #121212;
-    color: white;
-    font-family: Arial, sans-serif;
+    font-family: "Segoe UI", sans-serif;
+    background-color: #f7f7f8;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.face-container {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 10;
+}
+
+#kris-face {
+    width: 70px;
+    height: 70px;
+    background-color: #4da6ff;
+    border-radius: 50%;
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
 }
 
-.container {
-    width: 100%;
-    max-width: 400px;
-    padding: 20px;
-    box-sizing: border-box;
-}
-
-/* Face container */
-.face-container {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 20px;
-}
-
-.kris-face {
-    width: 150px;
-    height: 150px;
-    background-color: #4fa6f7;
-    border-radius: 50%;
-    position: relative;
-    animation: moodTransition 0.5s ease-in-out;
-}
-
-/* Eyes */
-.eye {
-    width: 12px;
-    height: 12px;
-    background-color: black;
-    border-radius: 50%;
-    position: absolute;
-    top: 45px;
-}
-.eye.left {
-    left: 40px;
-}
-.eye.right {
-    right: 40px;
-}
-
-/* Mouth */
-.mouth {
-    width: 20px;
-    height: 6px;
-    background-color: black;
-    border-radius: 50%;
-    position: absolute;
-    top: 90px;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-/* Feather with green > dark blue > gold */
 .feather {
+    width: 20px;
+    height: 50px;
+    background: linear-gradient(to bottom, #00c6ff, #0072ff);
     position: absolute;
-    top: -25px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: -20px;
+    left: 40%;
+    border-radius: 10px 10px 0 0;
+    transform: rotate(-20deg);
     animation: wave 2s infinite ease-in-out;
 }
-.feather div {
-    width: 24px;
-    height: 40px;
-    background-color: green;
-    border-radius: 50%;
-    position: relative;
+
+@keyframes wave {
+    0%, 100% { transform: rotate(-20deg); }
+    50% { transform: rotate(-10deg); }
 }
-.feather div::before {
-    content: '';
-    width: 18px;
-    height: 30px;
-    background-color: darkblue;
+
+.eyes {
+    width: 10px;
+    height: 10px;
+    background-color: black;
     border-radius: 50%;
     position: absolute;
-    top: 5px;
-    left: 3px;
+    top: 22px;
+    left: 18px;
 }
-.feather div::after {
+
+.eyes::after {
     content: '';
     width: 10px;
-    height: 20px;
-    background-color: gold;
+    height: 10px;
+    background-color: black;
     border-radius: 50%;
     position: absolute;
-    top: 10px;
-    left: 4px;
+    left: 24px;
 }
 
-/* Feather wave animation */
-@keyframes wave {
-    0%, 100% { transform: translateX(-50%) rotate(-10deg); }
-    50% { transform: translateX(-50%) rotate(10deg); }
+.mouth {
+    width: 20px;
+    height: 8px;
+    border-bottom: 3px solid black;
+    position: absolute;
+    top: 45px;
+    left: 25px;
+    border-radius: 0 0 10px 10px;
 }
 
-/* Chat Box */
-.chat-box {
-    background-color: #1e1e1e;
+.chat-container {
+    margin-top: 100px;
+    max-width: 700px;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
     padding: 10px;
-    border-radius: 10px;
-    min-height: 100px;
-    margin-bottom: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
 }
-.user-message,
-.bot-message {
-    margin: 5px 0;
+
+#chat-box {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 10px;
+    height: 60vh;
+}
+
+.message {
+    margin-bottom: 12px;
+    padding: 10px 14px;
+    border-radius: 12px;
+    max-width: 80%;
+    word-wrap: break-word;
     line-height: 1.4;
 }
 
-/* Chat Form */
-.chat-form {
-    display: flex;
-}
-.chat-form input[type="text"] {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    border-radius: 5px 0 0 5px;
-    outline: none;
-}
-.chat-form button {
-    padding: 10px;
-    background-color: #00bcd4;
-    color: white;
-    border: none;
-    border-radius: 0 5px 5px 0;
-    cursor: pointer;
-}
-.chat-form button:hover {
-    background-color: #0097a7;
+.message.user {
+    background-color: #dcf8c6;
+    align-self: flex-end;
 }
 
-/* Mood transitions */
-@keyframes moodTransition {
-    from { transform: scale(0.95); }
-    to { transform: scale(1); }
+.message.kris {
+    background-color: #e3e3e3;
+    align-self: flex-start;
+}
+
+#chat-form {
+    display: flex;
+    margin-top: 10px;
+}
+
+#user-input {
+    flex-grow: 1;
+    padding: 10px;
+    border-radius: 8px 0 0 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+#chat-form button {
+    padding: 10px 20px;
+    background-color: #4da6ff;
+    color: white;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    cursor: pointer;
 }
