@@ -24,9 +24,12 @@
 
     <!-- Chat Messages -->
     <div class="chat-box" id="chat-box">
-      {% for message in messages %}
-        <div class="message">{{ message }}</div>
-      {% endfor %}
+      {% if user_input %}
+        <div class="message user">You: {{ user_input }}</div>
+      {% endif %}
+      {% if response %}
+        <div class="message bot">Kris: {{ response }}</div>
+      {% endif %}
     </div>
 
     <!-- Input Form -->
