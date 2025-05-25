@@ -1,33 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Kris AI</title>
-  <!-- Correct way to link CSS in Flask -->
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta charset="UTF-8">
+    <title>Kris AI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-  <header>
-    <div class="header-text">
-      <h1>Kris AI</h1>
-      <p>I am Kris, a powerful AI-powered chatbot made by a 15-year-old Yash</p>
-    </div>
-    <div class="face">
-      <div class="feather"></div>
-      <div class="eye left"></div>
-      <div class="eye right"></div>
-      <div class="mouth"></div>
-    </div>
-  </header>
+    <div class="container">
+        <div class="face-container">
+            <div class="kris-face {{ mood }}">
+                <div class="feather">
+                    <div></div>
+                </div>
+                <div class="eye left"></div>
+                <div class="eye right"></div>
+                <div class="mouth"></div>
+            </div>
+        </div>
 
-  <main id="chat-container">
-    <!-- Leave empty if you don’t want default messages -->
-  </main>
+        <div class="chat-box">
+            {% if response %}
+                <div class="user-message"><strong>You:</strong> {{ request.form.get('message') }}</div>
+                <div class="bot-message"><strong>Kris:</strong> {{ response }}</div>
+            {% endif %}
+        </div>
 
-  <form id="chat-form">
-    <input type="text" placeholder="Ask something..." />
-    <button type="submit">Send</button>
-  </form>
+        <form method="POST" action="/send" class="chat-form">
+            <input type="text" name="message" placeholder="Ask Kris AI..." required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
 </body>
 </html>
