@@ -1,35 +1,180 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Kris AI Chat</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Kris AI Chat</title>
+<style>
+  /* Reset and base */
+  body, html {
+    margin: 0; padding: 0; height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    background: #fff;
+    color: #111;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+  }
+
+  /* Fixed header */
+  header {
+    background: #0b62ff;
+    color: white;
+    font-weight: 600;
+    padding: 15px;
+    text-align: center;
+    font-size: 1.2rem;
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 10;
+  }
+
+  /* Chat container */
+  #chat-container {
+    flex: 1;
+    margin-top: 60px; /* height of header */
+    padding: 10px 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    scroll-behavior: smooth;
+  }
+
+  /* Message bubbles */
+  .message {
+    max-width: 80%;
+    padding: 10px 15px;
+    border-radius: 18px;
+    font-size: 1rem;
+    line-height: 1.3;
+    word-wrap: break-word;
+  }
+
+  .user-msg {
+    background: #0b62ff;
+    color: white;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+  }
+
+  .ai-msg {
+    background: #f1f1f1;
+    color: #111;
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+
+  /* Fixed input form at bottom */
+  form {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ddd;
+    background: white;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  input[type="text"] {
+    flex: 1;
+    padding: 10px 15px;
+    font-size: 1rem;
+    border-radius: 20px;
+    border: 1px solid #ccc;
+    outline: none;
+  }
+
+  input[type="text"]:focus {
+    border-color: #0b62ff;
+    box-shadow: 0 0 5px #0b62ff;
+  }
+
+  button {
+    background: #0b62ff;
+    border: none;
+    color: white;
+    font-weight: 600;
+    padding: 0 15px;
+    margin-left: 10px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover:not(:disabled) {
+    background: #094ec7;
+  }
+
+  button:disabled {
+    background: #999;
+    cursor: not-allowed;
+  }
+
+  /* Responsive tweaks */
+  @media (max-width: 480px) {
+    #chat-container {
+      padding: 8px 12px;
+    }
+
+    .message {
+      font-size: 0.95rem;
+    }
+
+    header {
+      font-size: 1.1rem;
+      padding: 12px;
+    }
+  }
+</style>
 </head>
 <body>
-  <div id="face-container">
-    <div id="face" class="{{ mood }}">
-      <div class="eye left"></div>
-      <div class="eye right"></div>
-      <div id="smile"></div>
 
-      <!-- Feather on head -->
-      <svg id="feather" viewBox="0 0 50 100" xmlns="http://www.w3.org/2000/svg">
-        <ellipse class="feather-outer" cx="25" cy="50" rx="20" ry="45"/>
-        <ellipse class="feather-middle" cx="25" cy="50" rx="13" ry="32"/>
-        <ellipse class="feather-inner" cx="25" cy="50" rx="7" ry="16"/>
-      </svg>
-    </div>
-  </div>
+<header>Kris AI</header>
 
-  <form method="post" id="chat-form">
-    <input type="text" name="message" placeholder="Ask Kris AI..." required autocomplete="off" />
-    <button type="submit">Send</button>
-  </form>
+<div id="chat-container">
+  <div class="message ai-msg">Hi! How can I help you today?</div>
+</div>
 
-  {% if response %}
-  <div id="response-box">
-    <p>{{ response }}</p>
-  </div>
-  {% endif %}
+<form id="chat-form">
+  <input type="text" id="user-input" placeholder="Type your message..." autocomplete="off" required />
+  <button type="submit">Send</button>
+</form>
+
+<script>
+  const chatContainer = document.getElementById('chat-container');
+  const form = document.getElementById('chat-form');
+  const input = document.getElementById('user-input');
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const text = input.value.trim();
+    if (!text) return;
+
+    // Add user message
+    const userMsg = document.createElement('div');
+    userMsg.className = 'message user-msg';
+    userMsg.textContent = text;
+    chatContainer.appendChild(userMsg);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    input.value = '';
+    input.focus();
+
+    // Simulate AI reply after delay
+    setTimeout(() => {
+      const aiMsg = document.createElement('div');
+      aiMsg.className = 'message ai-msg';
+      aiMsg.textContent = 'This is a sample AI response.';
+      chatContainer.appendChild(aiMsg);
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }, 1000);
+  });
+</script>
+
 </body>
 </html>
