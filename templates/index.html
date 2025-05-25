@@ -8,7 +8,9 @@
 </head>
 <body>
   <div id="kris-face" class="mood-default">
-    <div class="feather"></div>
+    <div class="feather">
+      <div class="feather-inner-oval"></div>
+    </div>
     <div class="face-inner">
       <div class="eyes">
         <div class="eye"></div>
@@ -29,30 +31,4 @@
   <script>
     const form = document.getElementById("chat-form");
     const input = document.getElementById("user-input");
-    const chatBox = document.getElementById("chat-box");
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const userMessage = input.value.trim();
-      if (!userMessage) return;
-
-      chatBox.innerHTML += `<div class='message user'>${userMessage}</div>`;
-      input.value = "";
-      chatBox.scrollTop = chatBox.scrollHeight;
-
-      try {
-        const response = await fetch("/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: userMessage }),
-        });
-        const data = await response.json();
-        chatBox.innerHTML += `<div class='message bot'>${data.reply}</div>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
-      } catch (error) {
-        chatBox.innerHTML += `<div class='message bot'>Error: ${error.message}</div>`;
-      }
-    });
-  </script>
-</body>
-</html>
+    const chatBox = document.getElementById("chat
