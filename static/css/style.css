@@ -17,17 +17,21 @@ body {
 
 #kris-face {
   position: fixed;
-  top: 10px;
-  left: 10px;
-  width: 100px;
-  height: 100px;
+  top: 1vh;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22vw;
+  max-width: 100px;
+  height: 22vw;
+  max-height: 100px;
   border-radius: 50%;
   background: radial-gradient(circle, #3498db, #1c5a90);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+  z-index: 1000;
   transition: all 0.4s ease-in-out;
+  pointer-events: none;
 }
 
 #kris-face .feather {
