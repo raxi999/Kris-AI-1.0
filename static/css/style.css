@@ -1,25 +1,27 @@
-body {
+/* Global Styles */
+html, body {
   margin: 0;
   padding: 0;
+  height: 100dvh;
   font-family: 'Segoe UI', sans-serif;
   background: #121212;
   color: white;
   overflow: hidden;
 }
 
+/* Main Container */
 .chat-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
+  height: 100%;
   position: relative;
 }
 
+/* Kris Face (Sticky for keyboard visibility) */
 #kris-face {
-  position: fixed;
+  position: sticky;
   top: 1vh;
-  left: 50%;
-  transform: translateX(-50%);
+  margin: auto;
   width: 22vw;
   max-width: 100px;
   height: 22vw;
@@ -93,32 +95,40 @@ body {
 .mood-excited .mouth { width: 30px; height: 16px; border-radius: 0 0 20px 20px; }
 .mood-motivation .mouth { width: 14px; height: 14px; background: green; border-radius: 50%; }
 
+/* Chat Messages */
 .chat-box {
   flex: 1;
-  padding: 120px 10px 80px;
+  padding: 130px 10px 100px;
   overflow-y: auto;
   scroll-behavior: smooth;
 }
 
 .message {
-  margin: 10px;
-  padding: 10px 15px;
-  border-radius: 12px;
+  margin: 10px 14px;
+  padding: 12px 18px;
+  border-radius: 18px;
   max-width: 80%;
   word-wrap: break-word;
+  font-size: 15px;
+  line-height: 1.4;
+  transition: background 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
 .message.user {
   align-self: flex-end;
-  background: #1e88e5;
+  background: #1a73e8;
   color: white;
+  border-bottom-right-radius: 4px;
 }
 
 .message.bot {
   align-self: flex-start;
-  background: #333;
+  background: #2c2c2c;
+  border-bottom-left-radius: 4px;
 }
 
+/* Input Area */
 .input-area {
   display: flex;
   padding: 10px;
