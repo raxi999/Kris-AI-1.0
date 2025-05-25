@@ -7,31 +7,29 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-  <div class="chat-container">
 
-    <!-- Kris Face (Fixed Top-Left) -->
-    <div id="kris-face" class="mood-default">
-      <div class="feather"></div>
-      <div class="face-inner">
-        <div class="eyes">
-          <div class="eye"></div>
-          <div class="eye"></div>
-        </div>
-        <div class="mouth"></div>
+  <!-- Kris Face (Outside chat-container for fixed position) -->
+  <div id="kris-face" class="mood-default">
+    <div class="feather"></div>
+    <div class="face-inner">
+      <div class="eyes">
+        <div class="eye"></div>
+        <div class="eye"></div>
       </div>
+      <div class="mouth"></div>
     </div>
+  </div>
 
-    <!-- Chat Area -->
+  <!-- Main Chat UI -->
+  <div class="chat-container">
     <div class="chat-box" id="chat-box">
       <!-- Messages will appear here -->
     </div>
 
-    <!-- Input Area (Fixed at Bottom) -->
     <div class="input-area">
       <input type="text" id="user-input" placeholder="Ask Kris AI..." autocomplete="off" />
       <button onclick="sendMessage()">Send</button>
     </div>
-
   </div>
 
   <script>
