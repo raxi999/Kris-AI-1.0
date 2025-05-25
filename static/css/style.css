@@ -1,146 +1,133 @@
-/* Container for the face: top-left corner fixed */
+/* Black background and base */
+body {
+  margin: 0;
+  background-color: #121212;
+  color: #eee;
+  font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 120px; /* leave space for face fixed top-left */
+  height: 100vh;
+}
+
+/* Face container fixed top-left */
 #face-container {
   position: fixed;
   top: 20px;
   left: 20px;
-  width: 140px; /* big size */
-  height: 140px;
+  width: 150px;
+  height: 150px;
   z-index: 1000;
+  user-select: none;
 }
 
 /* Face circle */
 #face {
-  width: 140px;
-  height: 140px;
-  background-color: #0b3d91; /* deep blue */
-  border-radius: 50%;
   position: relative;
-  box-shadow: 0 0 10px #0b3d91;
-}
-
-/* Eyes - black dots */
-.eye {
-  width: 16px;
-  height: 16px;
-  background-color: black;
+  width: 150px;
+  height: 150px;
+  background-color: #0a3d62; /* Blue */
   border-radius: 50%;
+  box-shadow: 0 0 10px #0a3d62;
+}
+
+/* Eyes */
+.eye {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 50px;
+  width: 20px;
+  height: 20px;
+  background: black;
+  border-radius: 50%;
 }
-
 .eye.left {
-  left: 38px;
+  left: 40px;
 }
-
 .eye.right {
-  right: 38px;
+  right: 40px;
 }
 
-/* Smile curve */
+/* Smile - simple upward curve */
 #smile {
   position: absolute;
-  bottom: 35px;
+  bottom: 40px;
   left: 50%;
-  width: 60px;
+  width: 70px;
   height: 30px;
   border-bottom: 4px solid black;
-  border-radius: 0 0 40px 40px;
+  border-radius: 0 0 50px 50px;
   transform: translateX(-50%);
 }
 
-/* Feather container - positioned on top of face */
+/* Feather SVG */
 #feather {
   position: absolute;
-  top: -40px; /* adjusted above face */
+  top: -40px;
   left: 50%;
-  transform: translateX(-50%) rotate(-15deg);
-  width: 70px;
-  height: 140px;
-  z-index: 1100;
+  width: 60px;
+  height: 120px;
+  transform: translateX(-50%) rotate(-20deg);
   pointer-events: none;
 }
 
-/* Feather ovals */
-.feather-outer {
-  fill: darkblue;
+/* Feather colors - using ellipses inside SVG */
+#feather ellipse.feather-outer {
+  fill: #0b6623; /* Dark Green */
+  stroke: none;
+}
+#feather ellipse.feather-middle {
+  fill: #073763; /* Dark Blue */
+}
+#feather ellipse.feather-inner {
+  fill: #c49b1e; /* Gold */
 }
 
-.feather-middle {
-  fill: green;
-}
-
-.feather-inner {
-  fill: gold;
-}
-  
-/* Body background */
-body {
-  background-color: #121212;
-  color: #eee;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
+/* Form styling */
+form#chat-form {
+  margin-top: 20px;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-/* Main container */
-.container {
-  margin-top: 200px; /* leaves space for face */
+  width: 100%;
   max-width: 600px;
-  width: 90%;
+  gap: 10px;
 }
 
-/* Input and button */
-form {
-  display: flex;
-  margin-bottom: 20px;
-}
-
-input[type="text"] {
+form#chat-form input[type="text"] {
   flex: 1;
   padding: 12px 15px;
-  border-radius: 30px;
+  border-radius: 25px;
   border: none;
-  outline: none;
-  font-size: 16px;
-  background: #222;
+  font-size: 1rem;
+  background-color: #222;
   color: #eee;
-  box-shadow: 0 0 5px #0b3d91;
-  transition: box-shadow 0.3s ease;
+  outline: none;
+  box-shadow: 0 0 5px #0a3d62;
 }
 
-input[type="text"]:focus {
-  box-shadow: 0 0 12px #0b3d91;
-}
-
-button {
-  background-color: #0b3d91;
+form#chat-form button {
+  padding: 12px 25px;
+  background-color: #0a3d62;
+  color: #eee;
   border: none;
-  color: white;
-  padding: 12px 20px;
-  margin-left: 10px;
-  border-radius: 30px;
+  border-radius: 25px;
+  font-weight: bold;
   cursor: pointer;
-  font-weight: 600;
-  box-shadow: 0 0 8px #0b3d91;
   transition: background-color 0.3s ease;
 }
 
-button:hover {
-  background-color: #08306b;
+form#chat-form button:hover {
+  background-color: #07407a;
 }
 
-/* Response text */
-#response {
-  background: #222;
+/* Response box */
+#response-box {
+  margin-top: 20px;
+  max-width: 600px;
+  background-color: #1e1e1e;
   padding: 15px 20px;
-  border-radius: 15px;
-  box-shadow: 0 0 8px #0b3d91;
-  font-size: 16px;
-  line-height: 1.5;
-  white-space: pre-wrap;
+  border-radius: 10px;
+  box-shadow: 0 0 8px #0a3d62;
+  color: #ddd;
+  font-size: 1.1rem;
+  line-height: 1.4;
 }
