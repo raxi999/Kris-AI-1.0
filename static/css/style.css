@@ -14,15 +14,15 @@ html, body {
   display: flex;
   flex-direction: column;
   height: 100%;
-  position: relative;
-  padding-top: 80px; /* to not hide chat behind face */
+  padding-top: 80px;
 }
 
-/* Kris Face (fixed on screen always) */
+/* Kris Face (fixed top center) */
 #kris-face {
   position: fixed;
-  top: 12px;
-  left: 12px;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 60px;
   height: 60px;
   border-radius: 50%;
@@ -94,7 +94,7 @@ html, body {
 .mood-excited .mouth { width: 30px; height: 16px; border-radius: 0 0 20px 20px; }
 .mood-motivation .mouth { width: 14px; height: 14px; background: green; border-radius: 50%; }
 
-/* Chat Messages */
+/* Chat Box */
 .chat-box {
   flex: 1;
   padding: 20px 10px 100px;
@@ -102,6 +102,7 @@ html, body {
   scroll-behavior: smooth;
 }
 
+/* Message Bubbles */
 .message {
   margin: 10px 14px;
   padding: 12px 18px;
@@ -110,7 +111,6 @@ html, body {
   word-wrap: break-word;
   font-size: 15px;
   line-height: 1.4;
-  transition: background 0.3s ease;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
 
