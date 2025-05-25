@@ -1,9 +1,9 @@
 body {
     margin: 0;
     padding: 0;
+    background-color: #121212;
+    color: white;
     font-family: Arial, sans-serif;
-    background: #f4f8ff;
-    color: #333;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -11,174 +11,137 @@ body {
 }
 
 .container {
-    text-align: center;
-    width: 90%;
-    max-width: 500px;
+    width: 100%;
+    max-width: 400px;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
+/* Face container */
 .face-container {
-    margin: 20px auto;
-    position: relative;
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
 }
 
 .kris-face {
+    width: 150px;
+    height: 150px;
+    background-color: #4fa6f7;
+    border-radius: 50%;
     position: relative;
-    width: 120px;
-    height: 120px;
-    background-color: #3aa6ff;
-    border-radius: 50%;
-    margin: 0 auto;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* Face expressions by mood */
-.kris-face.default .mouth {
-    width: 20px;
-    height: 5px;
-    border-radius: 5px;
-    background: black;
-    bottom: 25%;
-    left: 50%;
-    transform: translateX(-50%);
-    position: absolute;
-}
-.kris-face.happy .mouth {
-    width: 25px;
-    height: 15px;
-    border-radius: 0 0 50px 50px;
-    background: black;
-    bottom: 25%;
-    left: 50%;
-    transform: translateX(-50%);
-    position: absolute;
-}
-.kris-face.thinking .mouth {
-    width: 20px;
-    height: 5px;
-    background: black;
-    border-radius: 2px;
-    transform: rotate(-20deg);
-    bottom: 30%;
-    left: 50%;
-    position: absolute;
-    transform: translateX(-50%) rotate(-20deg);
-}
-.kris-face.surprised .mouth {
-    width: 10px;
-    height: 10px;
-    background: black;
-    border-radius: 50%;
-    bottom: 28%;
-    left: 50%;
-    position: absolute;
-    transform: translateX(-50%);
-}
-.kris-face.motivation .mouth {
-    width: 22px;
-    height: 3px;
-    background: black;
-    bottom: 28%;
-    left: 50%;
-    position: absolute;
-    transform: translateX(-50%);
+    animation: moodTransition 0.5s ease-in-out;
 }
 
 /* Eyes */
 .eye {
-    width: 10px;
-    height: 10px;
-    background: black;
+    width: 12px;
+    height: 12px;
+    background-color: black;
     border-radius: 50%;
     position: absolute;
-    top: 35%;
+    top: 45px;
 }
 .eye.left {
-    left: 30%;
+    left: 40px;
 }
 .eye.right {
-    right: 30%;
+    right: 40px;
 }
 
-/* Feather */
-.feather {
+/* Mouth */
+.mouth {
+    width: 20px;
+    height: 6px;
+    background-color: black;
+    border-radius: 50%;
     position: absolute;
-    top: -35px;
+    top: 90px;
     left: 50%;
     transform: translateX(-50%);
-    width: 0;
-    height: 0;
 }
 
-.feather::before,
-.feather::after,
-.feather div {
-    content: '';
+/* Feather with green > dark blue > gold */
+.feather {
     position: absolute;
-    width: 15px;
-    height: 35px;
-    border-radius: 50%;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
     animation: wave 2s infinite ease-in-out;
-    transform-origin: bottom center;
-}
-
-.feather::before {
-    background: green;
-    left: -18px;
-}
-.feather::after {
-    background: blue;
-    left: 0px;
 }
 .feather div {
-    background: gold;
-    left: 18px;
+    width: 24px;
+    height: 40px;
+    background-color: green;
+    border-radius: 50%;
+    position: relative;
+}
+.feather div::before {
+    content: '';
+    width: 18px;
+    height: 30px;
+    background-color: darkblue;
+    border-radius: 50%;
+    position: absolute;
+    top: 5px;
+    left: 3px;
+}
+.feather div::after {
+    content: '';
+    width: 10px;
+    height: 20px;
+    background-color: gold;
+    border-radius: 50%;
+    position: absolute;
+    top: 10px;
+    left: 4px;
 }
 
+/* Feather wave animation */
 @keyframes wave {
-    0%, 100% { transform: rotate(0deg); }
-    50% { transform: rotate(10deg); }
+    0%, 100% { transform: translateX(-50%) rotate(-10deg); }
+    50% { transform: translateX(-50%) rotate(10deg); }
 }
 
-/* Chatbox */
+/* Chat Box */
 .chat-box {
-    background: white;
-    padding: 15px;
+    background-color: #1e1e1e;
+    padding: 10px;
     border-radius: 10px;
     min-height: 100px;
-    margin-bottom: 20px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    text-align: left;
+    margin-bottom: 15px;
+}
+.user-message,
+.bot-message {
+    margin: 5px 0;
+    line-height: 1.4;
 }
 
-.user-message, .bot-message {
-    margin-bottom: 10px;
-}
-
-/* Form */
+/* Chat Form */
 .chat-form {
     display: flex;
-    gap: 10px;
-    justify-content: center;
 }
-
 .chat-form input[type="text"] {
     flex: 1;
     padding: 10px;
-    border: 2px solid #3aa6ff;
-    border-radius: 5px;
-    font-size: 16px;
-}
-
-.chat-form button {
-    padding: 10px 20px;
-    background: #3aa6ff;
     border: none;
+    border-radius: 5px 0 0 5px;
+    outline: none;
+}
+.chat-form button {
+    padding: 10px;
+    background-color: #00bcd4;
     color: white;
-    border-radius: 5px;
-    font-size: 16px;
+    border: none;
+    border-radius: 0 5px 5px 0;
     cursor: pointer;
 }
-
 .chat-form button:hover {
-    background: #2d8de0;
+    background-color: #0097a7;
+}
+
+/* Mood transitions */
+@keyframes moodTransition {
+    from { transform: scale(0.95); }
+    to { transform: scale(1); }
 }
