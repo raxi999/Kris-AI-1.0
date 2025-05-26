@@ -59,42 +59,35 @@ body {
   margin-top: 20px; /* Pulled further down */
 }
 
-/* Feather using oval technique */
+/* Feather (oval technique) */
 .feather {
+  width: 26px;
+  height: 50px;
+  background-color: green; /* Outer feather */
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
   position: absolute;
-  top: -30px;
+  top: -28px;
   left: 50%;
-  transform: translateX(-50%) rotate(25deg); /* Tilted right */
-  animation: wave 2s infinite ease-in-out;
-}
-.oval {
-  position: absolute;
-  border-radius: 50%;
-}
-.gold {
-  width: 20px;
-  height: 40px;
-  background-color: green;
-  z-index: 1;
-}
-.blue {
-  width: 14px;
-  height: 28px;
-  background-color: darkblue;
-  left: 3px;
-  top: 6px;
-  z-index: 2;
+  transform: translateX(-50%) rotate(25deg); /* Tilt right */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 5px rgba(0, 255, 0, 0.3);
 }
 
-/* Feather Animation */
-@keyframes wave {
-  0%, 100% {
-    transform: translateX(-50%) rotate(20deg);
-  }
-  50% {
-    transform: translateX(-50%) rotate(30deg);
-  }
+/* Inner dark blue oval */
+.feather::after {
+  content: '';
+  width: 12px;
+  height: 24px;
+  background-color: darkblue;
+  border-radius: 50%;
 }
+
+
+/* Feather Animation */
+
+animation: wave 2s infinite ease-in-out;
 
 /* Eyes & Mouth */
 .eyes {
@@ -145,7 +138,7 @@ body {
 form {
   display: flex;
   padding: 10px 16px;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   background-color: #2a2a2a;
   box-shadow: 0 -2px 6px rgba(0,0,0,0.4);
 }
