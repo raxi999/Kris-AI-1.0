@@ -8,6 +8,13 @@
 </head>
 <body>
   <div class="chat-container">
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="kris-title">Kris AI <span class="subtext">Your personal assistant</span></div>
+      <div class="kris-badge">Kris AI</div>
+    </div>
+
     <!-- Kris Face -->
     <div class="kris-face">
       <div class="feather">
@@ -24,7 +31,7 @@
       </div>
     </div>
 
-    <!-- Chat Messages -->
+    <!-- Chat Box -->
     <div class="chat-box" id="chat-box">
       {% if user_input %}
         <div class="message user">You: {{ user_input }}</div>
