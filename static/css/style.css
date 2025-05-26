@@ -1,4 +1,4 @@
-/* Body Layout */
+/* General Reset */
 body {
   margin: 0;
   padding: 0;
@@ -9,64 +9,52 @@ body {
   overflow: hidden;
 }
 
-/* Container */
+/* Layout Container */
 .chat-container {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  padding: 12px;
-  box-sizing: border-box;
+  overflow: hidden;
+  padding: 0;
 }
 
-/* Top Bar */
-.top-bar {
+/* Header with logo and title */
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
+  padding: 10px 16px;
+  background-color: #1a1a1a;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4);
 }
 
-.kris-title {
-  font-size: 1.2rem;
+.branding {
+  font-size: 1.1rem;
   font-weight: bold;
   color: #4da6ff;
 }
 
-.subtext {
-  font-size: 0.8rem;
-  font-weight: normal;
-  color: #ccc;
-  margin-left: 6px;
-}
-
-.kris-badge {
-  background-color: #4da6ff;
-  color: white;
-  padding: 6px 12px;
-  border-radius: 20px;
-  font-weight: bold;
-  box-shadow: 0 0 10px #4da6ff;
-}
-
-/* Kris Face */
 .kris-face {
-  width: 140px;
-  height: 140px;
+  width: 60px;
+  height: 60px;
   background-color: #4da6ff;
   border-radius: 50%;
   position: relative;
-  margin: 0 auto 15px;
-  box-shadow: 0 0 15px #4da6ff;
+  box-shadow: 0 0 10px #4da6ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
 }
 
-/* Feather */
+/* Feather with layered ovals */
 .feather {
-  width: 38px;
-  height: 76px;
+  width: 28px;
+  height: 58px;
   background-color: green;
-  border-radius: 50% / 60% 60% 40% 40%;
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
   position: absolute;
-  top: -42px;
+  top: -36px;
   left: 50%;
   transform: translateX(-50%) rotate(-20deg);
   animation: wave 2s infinite ease-in-out;
@@ -74,22 +62,20 @@ body {
   align-items: center;
   justify-content: center;
 }
-
-.feather-gold {
-  width: 28px;
-  height: 56px;
+.feather::before {
+  content: '';
+  width: 16px;
+  height: 32px;
   background-color: gold;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
-
-.feather-inner {
-  width: 16px;
-  height: 34px;
+.feather::after {
+  content: '';
+  width: 10px;
+  height: 22px;
   background-color: darkblue;
   border-radius: 50%;
+  position: absolute;
 }
 
 @keyframes wave {
@@ -103,120 +89,80 @@ body {
 
 /* Eyes & Mouth */
 .eyes {
-  position: absolute;
-  top: 48px;
-  width: 100%;
   display: flex;
-  justify-content: center;
-  gap: 28px;
+  gap: 8px;
 }
-
 .eye {
-  width: 14px;
-  height: 14px;
-  background-color: black;
+  width: 8px;
+  height: 8px;
+  background: black;
   border-radius: 50%;
-  position: relative;
 }
-
-.eye::after {
-  content: "";
-  width: 4px;
-  height: 4px;
-  background-color: white;
-  border-radius: 50%;
-  position: absolute;
-  top: 2px;
-  left: 2px;
-}
-
 .mouth {
-  position: absolute;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.default-mouth {
-  width: 30px;
-  height: 15px;
-  border-bottom: 4px solid black;
+  width: 20px;
+  height: 10px;
+  border-bottom: 2px solid black;
   border-radius: 0 0 50% 50%;
+  margin-top: 6px;
 }
 
 /* Chat Box */
 .chat-box {
   flex: 1;
   background-color: #1e1e1e;
-  padding: 10px;
-  border-radius: 10px;
+  padding: 12px;
   overflow-y: auto;
-  margin-bottom: 15px;
-  box-shadow: 0 0 10px #333;
+  scroll-behavior: smooth;
 }
 
-/* Chat message style */
+/* Message bubbles */
 .message {
   margin: 10px 0;
-  word-wrap: break-word;
-  line-height: 1.5;
   font-size: 1rem;
+  line-height: 1.5;
 }
-
-.message.user {
+.user {
   text-align: right;
   color: #4da6ff;
 }
-
-.message.bot {
+.bot {
   text-align: left;
-  color: #fff;
+  color: #eeeeee;
 }
 
 /* Input Form */
 form {
   display: flex;
-  gap: 8px;
-  align-items: center;
-  padding: 5px 0;
-  border-radius: 12px;
+  padding: 10px 16px;
   background-color: #2a2a2a;
-  box-shadow: 0 0 8px #4da6ff;
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.4);
 }
-
 input[type="text"] {
   flex: 1;
-  padding: 12px 16px;
-  border-radius: 12px;
-  border: none;
+  padding: 10px 14px;
   font-size: 1rem;
-  outline: none;
   background: #333;
   color: white;
-  box-shadow: inset 0 0 5px #000;
+  border: none;
+  border-radius: 10px;
+  outline: none;
 }
-
-input[type="text"]:focus {
-  background-color: #444;
-}
-
 button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 10px;
+  margin-left: 10px;
   background-color: #4da6ff;
   border: none;
   border-radius: 50%;
-  cursor: pointer;
   width: 44px;
   height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.3s;
 }
-
 button:hover {
   background-color: #3399ff;
 }
-
 button svg {
-  display: block;
+  fill: white;
 }
