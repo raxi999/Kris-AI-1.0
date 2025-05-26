@@ -7,19 +7,15 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
-  <div class="chat-container">
-
-    <!-- Top Bar -->
-    <div class="top-bar">
-      <div class="kris-title">Kris AI <span class="subtext">Your personal assistant</span></div>
-      <div class="kris-badge">Kris AI</div>
+  <div class="top-bar">
+    <div class="branding">
+      <h1>Kris AI</h1>
+      <p>Your personal assistant</p>
     </div>
-
-    <!-- Kris Face -->
     <div class="kris-face">
       <div class="feather">
         <div class="feather-gold">
-          <div class="feather-inner"></div>
+          <div class="feather-blue"></div>
         </div>
       </div>
       <div class="eyes">
@@ -30,8 +26,9 @@
         <div class="default-mouth"></div>
       </div>
     </div>
+  </div>
 
-    <!-- Chat Box -->
+  <div class="chat-container">
     <div class="chat-box" id="chat-box">
       {% if user_input %}
         <div class="message user">You: {{ user_input }}</div>
@@ -41,7 +38,6 @@
       {% endif %}
     </div>
 
-    <!-- Input Form -->
     <form method="POST">
       <input type="text" name="user_input" placeholder="Type your message..." autocomplete="off" required />
       <button type="submit" aria-label="Send message">
