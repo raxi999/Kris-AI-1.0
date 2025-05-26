@@ -84,10 +84,18 @@ body {
   border-radius: 50%;
 }
 
+.feather {
+  animation: wave 2s infinite ease-in-out;
+}
 
-/* Feather Animation */
-
-animation: wave 2s infinite ease-in-out;
+@keyframes wave {
+  0%, 100% {
+    transform: translateX(-50%) rotate(25deg);
+  }
+  50% {
+    transform: translateX(-50%) rotate(15deg);
+  }
+}
 
 /* Eyes & Mouth */
 .eyes {
