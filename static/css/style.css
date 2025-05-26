@@ -33,15 +33,26 @@ body {
 
 /* Feather */
 .feather {
-  width: 34px;
-  height: 68px;
+  width: 40px;
+  height: 80px;
   background-color: green;
-  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  border-radius: 50%;
   position: absolute;
-  top: -38px;
+  top: -42px;
   left: 50%;
   transform: translateX(-50%) rotate(-20deg);
   animation: wave 2s infinite ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 8px limegreen;
+}
+
+.feather-gold {
+  width: 28px;
+  height: 56px;
+  background-color: gold;
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
