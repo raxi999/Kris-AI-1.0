@@ -20,7 +20,7 @@ body {
 .top-bar {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 10px 16px;
   background-color: #1a1a1a;
   box-shadow: 0 2px 5px rgba(0,0,0,0.4);
@@ -56,15 +56,15 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 12px; /* Pulled down */
+  margin-top: 20px; /* Pulled further down */
 }
 
 /* Feather using oval technique */
 .feather {
   position: absolute;
-  top: -35px;
+  top: -30px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) rotate(25deg); /* Tilted right */
   animation: wave 2s infinite ease-in-out;
 }
 .oval {
@@ -89,10 +89,10 @@ body {
 /* Feather Animation */
 @keyframes wave {
   0%, 100% {
-    transform: translateX(-50%) rotate(-20deg);
+    transform: translateX(-50%) rotate(20deg);
   }
   50% {
-    transform: translateX(-50%) rotate(-10deg);
+    transform: translateX(-50%) rotate(30deg);
   }
 }
 
@@ -145,6 +145,7 @@ body {
 form {
   display: flex;
   padding: 10px 16px;
+  margin-bottom: 8px;
   background-color: #2a2a2a;
   box-shadow: 0 -2px 6px rgba(0,0,0,0.4);
 }
@@ -162,18 +163,13 @@ button {
   margin-left: 10px;
   background-color: #4da6ff;
   border: none;
-  border-radius: 50%;
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 1rem;
+  color: white;
   cursor: pointer;
-  transition: 0.3s;
+  transition: background 0.3s;
 }
 button:hover {
   background-color: #3399ff;
-}
-button svg {
-  fill: white;
 }
