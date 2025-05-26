@@ -60,16 +60,16 @@ body {
 }
 
 /* Feather (oval technique) */
-/* Feather (proper placement and animation) */
+/* Feather (accurately centered on head) */
 .feather {
   width: 26px;
   height: 50px;
-  background-color: green; /* Outer feather */
+  background-color: green;
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
   position: absolute;
-  top: -30px;
+  top: -40px; /* Adjusted higher to sit on head */
   left: 50%;
-  transform: translateX(-50%) rotate(-25deg); /* Tilt left */
+  transform: translate(-50%, 0) rotate(-20deg); /* Proper center + tilt */
   transform-origin: bottom center;
   display: flex;
   align-items: center;
@@ -90,32 +90,10 @@ body {
 /* Feather waving animation */
 @keyframes wave {
   0%, 100% {
-    transform: translateX(-50%) rotate(-25deg);
+    transform: translate(-50%, 0) rotate(-20deg);
   }
   50% {
-    transform: translateX(-50%) rotate(-15deg);
-  }
-}
-
-/* Inner dark blue oval */
-.feather::after {
-  content: '';
-  width: 12px;
-  height: 24px;
-  background-color: darkblue;
-  border-radius: 50%;
-}
-
-.feather {
-  animation: wave 2s infinite ease-in-out;
-}
-
-@keyframes wave {
-  0%, 100% {
-    transform: translateX(-50%) rotate(25deg);
-  }
-  50% {
-    transform: translateX(-50%) rotate(15deg);
+    transform: translate(-50%, 0) rotate(-10deg);
   }
 }
 
