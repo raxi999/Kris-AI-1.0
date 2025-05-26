@@ -57,6 +57,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  margin-top: 8px;  /* <-- Added to pull the face down */
 }
 
 /* Feather */
