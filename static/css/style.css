@@ -1,4 +1,4 @@
-/* Prevent full-page scroll */
+/* Body Layout */
 body {
   margin: 0;
   padding: 0;
@@ -9,15 +9,43 @@ body {
   overflow: hidden;
 }
 
-/* Layout container */
+/* Container */
 .chat-container {
   display: flex;
   flex-direction: column;
-  max-width: 100%;
   height: 100vh;
-  padding: 15px;
+  padding: 12px;
   box-sizing: border-box;
-  overflow: hidden;
+}
+
+/* Top Bar */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.kris-title {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #4da6ff;
+}
+
+.subtext {
+  font-size: 0.8rem;
+  font-weight: normal;
+  color: #ccc;
+  margin-left: 6px;
+}
+
+.kris-badge {
+  background-color: #4da6ff;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-weight: bold;
+  box-shadow: 0 0 10px #4da6ff;
 }
 
 /* Kris Face */
@@ -27,16 +55,16 @@ body {
   background-color: #4da6ff;
   border-radius: 50%;
   position: relative;
-  margin: 0 auto 20px;
+  margin: 0 auto 15px;
   box-shadow: 0 0 15px #4da6ff;
 }
 
 /* Feather */
 .feather {
-  width: 40px;
-  height: 80px;
+  width: 38px;
+  height: 76px;
   background-color: green;
-  border-radius: 50%;
+  border-radius: 50% / 60% 60% 40% 40%;
   position: absolute;
   top: -42px;
   left: 50%;
@@ -45,7 +73,6 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 8px limegreen;
 }
 
 .feather-gold {
@@ -59,8 +86,8 @@ body {
 }
 
 .feather-inner {
-  width: 18px;
-  height: 36px;
+  width: 16px;
+  height: 34px;
   background-color: darkblue;
   border-radius: 50%;
 }
@@ -131,10 +158,19 @@ body {
 /* Chat message style */
 .message {
   margin: 10px 0;
-  text-align: left;
   word-wrap: break-word;
   line-height: 1.5;
   font-size: 1rem;
+}
+
+.message.user {
+  text-align: right;
+  color: #4da6ff;
+}
+
+.message.bot {
+  text-align: left;
+  color: #fff;
 }
 
 /* Input Form */
@@ -158,7 +194,6 @@ input[type="text"] {
   background: #333;
   color: white;
   box-shadow: inset 0 0 5px #000;
-  transition: background-color 0.3s ease;
 }
 
 input[type="text"]:focus {
@@ -176,7 +211,6 @@ button {
   cursor: pointer;
   width: 44px;
   height: 44px;
-  transition: background-color 0.3s ease;
 }
 
 button:hover {
@@ -185,5 +219,4 @@ button:hover {
 
 button svg {
   display: block;
-  pointer-events: none;
 }
