@@ -74,7 +74,7 @@ body {
 .gold {
   width: 20px;
   height: 40px;
-  background-color: gold;
+  background-color: green;
   z-index: 1;
 }
 .blue {
