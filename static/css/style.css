@@ -57,7 +57,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 8px;  /* <-- Added to pull the face down */
+  margin-top: 16px;  /* pulled more down */
 }
 
 /* Feather */
@@ -67,7 +67,7 @@ body {
   background-color: green;
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
   position: absolute;
-  top: -36px;
+  top: -44px;  /* moved feather higher to sit on head */
   left: 50%;
   transform: translateX(-50%) rotate(-20deg);
   animation: wave 2s infinite ease-in-out;
