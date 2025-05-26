@@ -7,33 +7,31 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
-  <div class="chat-container">
-    
-    <!-- Top Bar -->
-    <div class="top-bar">
-      <div class="branding">
-        <h1>Kris AI</h1>
-        <p>Your personal assistant</p>
-      </div>
-      <div class="kris-face-wrapper">
-        <div class="kris-face">
-          <div class="feather">
-            <div class="feather-gold">
-              <div class="feather-blue"></div>
-            </div>
-          </div>
-          <div class="eyes">
-            <div class="eye"></div>
-            <div class="eye"></div>
-          </div>
-          <div class="mouth">
-            <div class="default-mouth"></div>
-          </div>
+  <div class="top-bar">
+    <div class="branding">
+      <h1>Kris AI</h1>
+      <p>Your personal assistant</p>
+    </div>
+    <div class="kris-face-wrapper">
+      <div class="kris-face">
+        <!-- Feather with oval design -->
+        <div class="feather">
+          <div class="feather-oval green"></div>
+          <div class="feather-oval blue"></div>
+          <div class="feather-oval gold"></div>
+        </div>
+        <div class="eyes">
+          <div class="eye"></div>
+          <div class="eye"></div>
+        </div>
+        <div class="mouth">
+          <div class="default-mouth"></div>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- Chat Box -->
+  <div class="chat-container">
     <div class="chat-box" id="chat-box">
       {% if user_input %}
         <div class="message user">You: {{ user_input }}</div>
@@ -43,12 +41,15 @@
       {% endif %}
     </div>
 
-    <!-- Input Form -->
-    <form method="POST" class="input-form">
+    <!-- Input form -->
+    <form method="POST">
       <input type="text" name="user_input" placeholder="Type your message..." autocomplete="off" required />
-      <button type="submit" aria-label="Send message">Send</button>
+      <button type="submit" aria-label="Send message">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="white" height="24" width="24" viewBox="0 0 24 24">
+          <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+        </svg>
+      </button>
     </form>
-
   </div>
 </body>
 </html>
