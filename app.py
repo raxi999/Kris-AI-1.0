@@ -1,64 +1,95 @@
-from flask import Flask, render_template, request
+from flask import Flask, request, jsonify, render_template
 import wikipedia
-import requests
-import os
+import random
+import difflib
 
 app = Flask(__name__)
 
-def get_wikipedia_summary(query):
-    try:
-        wikipedia.set_lang("en")
-        summary = wikipedia.summary(query, sentences=2)
-        if "may refer to" in summary.lower() or len(summary) < 40:
-            return None
-        return summary
-    except:
-        return None
+# --- Trigger phrases ---
+knowledge_triggers = [
+    "tell me about", "who is", "what is", "what's", "whats", "explain",
+    "can you explain", "could you explain", "do you know about", "give me information about",
+    "i want to know about", "please explain", "details about", "information on", "what are", "who are"
+]
+greeting_triggers = ["hi", "hello", "hey", "yo", "namaste"]
+thanks_triggers = ["thanks", "thank you", "thx"]
+goodbye_triggers = ["bye", "goodbye", "see you", "see ya", "cya"]
 
-def get_duckduckgo_summary(query):
-    try:
-        url = f"https://api.duckduckgo.com/?q={query}&format=json&no_html=1"
-        res = requests.get(url)
-        data = res.json()
-        if data.get("Abstract"):
-            return data["Abstract"]
-        return "Sorry, I couldn’t find information on that topic."
-    except:
-        return "Sorry, something went wrong while searching."
+# --- Utils ---
+def fuzzy_match(phrase_list, user_input):
+    lowered = user_input.lower()
+    for phrase in phrase_list:
+        if phrase in lowered:
+            return True
+        close = difflib.get_close_matches(lowered, [phrase], cutoff=0.75)
+        if close:
+            return True
+    return False
 
-def detect_mood(user_input):
-    user_input = user_input.lower()
-    greetings = ['hi', 'hello', 'hey']
-    motivation = ['lazy', 'tired', 'no mood', 'bore', 'boring']
-    surprised = ['what!', 'no way', 'really?', 'unbelievable']
-    question_words = ['what is', 'who is', 'tell me about', 'explain', 'give info', 'do you know', 'please explain']
+def detect_topic_query(user_input):
+    return fuzzy_match(knowledge_triggers, user_input)
 
-    if any(word in user_input for word in greetings):
-        return 'happy'
-    elif any(word in user_input for word in motivation):
-        return 'motivation'
-    elif any(word in user_input for word in surprised):
-        return 'surprised'
-    elif any(q in user_input for q in question_words) or user_input.endswith('?'):
-        return 'thinking'
-    else:
-        return 'default'
+def extract_topic(user_input):
+    lowered = user_input.lower()
+    for phrase in knowledge_triggers:
+        if phrase in lowered:
+            return lowered.split(phrase, 1)[-1].strip(" ?.!").title()
+        close = difflib.get_close_matches(phrase, [lowered], n=1, cutoff=0.75)
+        if close:
+            return lowered.split(phrase.split()[0], 1)[-1].strip(" ?.!").title()
+    return user_input.strip(" ?.!").title()
 
-@app.route('/', methods=['GET', 'POST'])
+def rephrase_summary(summary, topic):
+    intros = [
+        f"Sure! Here's what I found about {topic}:",
+        f"Let me explain {topic} in simple words:",
+        f"Of course! So, {topic} is...",
+        f"Here's a quick overview of {topic}:",
+        f"Glad you asked! {topic} can be described as:",
+        f"Alright! Here's something about {topic}:",
+        f"Basically, {topic} is known for..."
+    ]
+    return f"{random.choice(intros)} {summary}"
+
+def generate_greeting():
+    replies = ["Hey there!", "Hi!", "Namaste!", "Yo! How can I help?", "Hello friend!"]
+    return random.choice(replies)
+
+def generate_goodbye():
+    replies = ["Goodbye!", "See you soon!", "Take care!", "Bye-bye!", "See ya!"]
+    return random.choice(replies)
+
+def generate_thanks_reply():
+    replies = ["You're welcome!", "No problem!", "Anytime!", "Glad to help!", "My pleasure!"]
+    return random.choice(replies)
+
+# --- Flask Routes ---
+@app.route("/")
 def home():
-    response = None
-    mood = "default"
-    user_input = None
+    return render_template("index.html")  # Your frontend (optional)
 
-    if request.method == 'POST':
-        user_input = request.form.get('user_input')
-        mood = detect_mood(user_input)
-        response = get_wikipedia_summary(user_input)
-        if not response:
-            response = get_duckduckgo_summary(user_input)
+@app.route("/chat", methods=["POST"])
+def chat():
+    user_input = request.json.get("message", "")
+    response = "I'm not sure how to respond to that yet."
 
-    return render_template('index.html', response=response, mood=mood, user_input=user_input)
+    if fuzzy_match(greeting_triggers, user_input):
+        response = generate_greeting()
+    elif fuzzy_match(goodbye_triggers, user_input):
+        response = generate_goodbye()
+    elif fuzzy_match(thanks_triggers, user_input):
+        response = generate_thanks_reply()
+    elif detect_topic_query(user_input):
+        topic = extract_topic(user_input)
+        try:
+            summary = wikipedia.summary(topic, sentences=2)
+            response = rephrase_summary(summary, topic)
+        except Exception:
+            response = f"Hmm, I couldn't find enough about '{topic}'. Try asking something else!"
+    else:
+        response = "Hmm... I'm still learning. Try asking about a topic or say hi!"
 
-if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    return jsonify({"reply": response})
+
+if __name__ == "__main__":
+    app.run(debug=True)
