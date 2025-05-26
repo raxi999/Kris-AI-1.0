@@ -7,30 +7,33 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
 </head>
 <body>
-  <div class="top-bar">
-    <div class="branding">
-      <h1>Kris AI</h1>
-      <p>Your personal assistant</p>
-    </div>
-    <div class="kris-face-wrapper">
-      <div class="kris-face">
-        <div class="feather">
-          <div class="feather-gold">
-            <div class="feather-blue"></div>
+  <div class="chat-container">
+    
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="branding">
+        <h1>Kris AI</h1>
+        <p>Your personal assistant</p>
+      </div>
+      <div class="kris-face-wrapper">
+        <div class="kris-face">
+          <div class="feather">
+            <div class="feather-gold">
+              <div class="feather-blue"></div>
+            </div>
           </div>
-        </div>
-        <div class="eyes">
-          <div class="eye"></div>
-          <div class="eye"></div>
-        </div>
-        <div class="mouth">
-          <div class="default-mouth"></div>
+          <div class="eyes">
+            <div class="eye"></div>
+            <div class="eye"></div>
+          </div>
+          <div class="mouth">
+            <div class="default-mouth"></div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <div class="chat-container">
+    <!-- Chat Box -->
     <div class="chat-box" id="chat-box">
       {% if user_input %}
         <div class="message user">You: {{ user_input }}</div>
@@ -40,7 +43,7 @@
       {% endif %}
     </div>
 
-    <!-- Input box -->
+    <!-- Input Form -->
     <form method="POST">
       <input type="text" name="user_input" placeholder="Type your message..." autocomplete="off" required />
       <button type="submit" aria-label="Send message">
@@ -49,6 +52,7 @@
         </svg>
       </button>
     </form>
+
   </div>
 </body>
 </html>
