@@ -15,11 +15,10 @@ body {
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  padding: 0;
 }
 
-/* Header with logo and title */
-.header {
+/* Top Bar */
+.top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -28,12 +27,25 @@ body {
   box-shadow: 0 2px 5px rgba(0,0,0,0.4);
 }
 
-.branding {
-  font-size: 1.1rem;
-  font-weight: bold;
+/* Branding */
+.branding h1 {
+  margin: 0;
+  font-size: 1.2rem;
   color: #4da6ff;
 }
+.branding p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #ccc;
+}
 
+/* Kris Face Wrapper (right) */
+.kris-face-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+/* Kris Face */
 .kris-face {
   width: 60px;
   height: 60px;
@@ -42,12 +54,12 @@ body {
   position: relative;
   box-shadow: 0 0 10px #4da6ff;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-right: 10px;
 }
 
-/* Feather with layered ovals */
+/* Feather */
 .feather {
   width: 28px;
   height: 58px;
@@ -78,6 +90,7 @@ body {
   position: absolute;
 }
 
+/* Feather Animation */
 @keyframes wave {
   0%, 100% {
     transform: translateX(-50%) rotate(-20deg);
@@ -99,11 +112,13 @@ body {
   border-radius: 50%;
 }
 .mouth {
+  margin-top: 6px;
+}
+.default-mouth {
   width: 20px;
   height: 10px;
   border-bottom: 2px solid black;
   border-radius: 0 0 50% 50%;
-  margin-top: 6px;
 }
 
 /* Chat Box */
@@ -115,7 +130,7 @@ body {
   scroll-behavior: smooth;
 }
 
-/* Message bubbles */
+/* Message Bubbles */
 .message {
   margin: 10px 0;
   font-size: 1rem;
