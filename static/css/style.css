@@ -57,17 +57,17 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-top: 16px;  /* pulled more down */
+  margin-top: 16px; /* Pulled slightly down */
 }
 
 /* Feather */
 .feather {
-  width: 28px;
-  height: 58px;
+  width: 24px;
+  height: 48px;
   background-color: green;
   border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
   position: absolute;
-  top: -44px;  /* moved feather higher to sit on head */
+  top: -30px; /* Feather sits right on head */
   left: 50%;
   transform: translateX(-50%) rotate(-20deg);
   animation: wave 2s infinite ease-in-out;
@@ -77,8 +77,8 @@ body {
 }
 .feather::before {
   content: '';
-  width: 16px;
-  height: 32px;
+  width: 14px;
+  height: 28px;
   background-color: gold;
   border-radius: 50%;
 }
