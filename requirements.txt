@@ -1,5 +1,14 @@
 Flask==2.3.2
-gunicorn
+gunicorn==21.2.0
 requests
 wikipedia
 duckduckgo-search
+nltk
+sympy
+pywhatkit
+pyjokes
+spacy
+textblob
+transformers
+torch
+wikipedia-api
