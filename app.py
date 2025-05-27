@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, render_template
 import wikipedia
 import random
 import difflib
@@ -63,33 +63,34 @@ def generate_thanks_reply():
     replies = ["You're welcome!", "No problem!", "Anytime!", "Glad to help!", "My pleasure!"]
     return random.choice(replies)
 
-# --- Flask Routes ---
-@app.route("/")
+
+# --- Routes ---
+@app.route("/", methods=["GET", "POST"])
 def home():
-    return render_template("index.html")  # Your frontend (optional)
+    user_input = None
+    response = None
 
-@app.route("/chat", methods=["POST"])
-def chat():
-    user_input = request.json.get("message", "")
-    response = "I'm not sure how to respond to that yet."
+    if request.method == "POST":
+        user_input = request.form.get("user_input", "").strip()
+        if user_input:
+            if fuzzy_match(greeting_triggers, user_input):
+                response = generate_greeting()
+            elif fuzzy_match(goodbye_triggers, user_input):
+                response = generate_goodbye()
+            elif fuzzy_match(thanks_triggers, user_input):
+                response = generate_thanks_reply()
+            elif detect_topic_query(user_input):
+                topic = extract_topic(user_input)
+                try:
+                    summary = wikipedia.summary(topic, sentences=2)
+                    response = rephrase_summary(summary, topic)
+                except Exception:
+                    response = f"Hmm, I couldn't find enough about '{topic}'. Try asking something else!"
+            else:
+                response = "Hmm... I'm still learning. Try asking about a topic or say hi!"
 
-    if fuzzy_match(greeting_triggers, user_input):
-        response = generate_greeting()
-    elif fuzzy_match(goodbye_triggers, user_input):
-        response = generate_goodbye()
-    elif fuzzy_match(thanks_triggers, user_input):
-        response = generate_thanks_reply()
-    elif detect_topic_query(user_input):
-        topic = extract_topic(user_input)
-        try:
-            summary = wikipedia.summary(topic, sentences=2)
-            response = rephrase_summary(summary, topic)
-        except Exception:
-            response = f"Hmm, I couldn't find enough about '{topic}'. Try asking something else!"
-    else:
-        response = "Hmm... I'm still learning. Try asking about a topic or say hi!"
+    return render_template("index.html", user_input=user_input, response=response)
 
-    return jsonify({"reply": response})
 
 if __name__ == "__main__":
     app.run(debug=True)
