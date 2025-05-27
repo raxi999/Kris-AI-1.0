@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template
 import wikipedia
-from duckduckgo_search import ddg_answers
+from duckduckgo_search import ddg  # Changed import here
 from nltk.corpus import wordnet
 import sympy
 import pywhatkit
@@ -94,9 +94,11 @@ def wikiapi_summary(topic):
     return None
 
 def duckduckgo_search(topic):
-    results = ddg_answers(topic, max_results=3)
+    results = ddg(topic, max_results=3)
     if results:
-        return " ".join(results)
+        # Extract the 'body' snippet from each result if available
+        snippets = [res.get('body', '') for res in results if 'body' in res]
+        return " ".join(snippets)
     return None
 
 def wordnet_definition(word):
