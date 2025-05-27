@@ -17,7 +17,7 @@ app = Flask(__name__)
 # Load SpaCy model
 nlp = spacy.load("en_core_web_sm")
 
-# Load transformers QA pipeline (use small model for speed)
+# Load transformers QA pipeline
 qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
 
 wiki_api = wikipediaapi.Wikipedia('en')
@@ -118,7 +118,6 @@ def sympy_solve(expr):
 
 def pywhatkit_info(topic):
     try:
-        # Get 2 lines info from pywhatkit (wrap in try since it uses online scraping)
         return pywhatkit.info(topic, lines=2)
     except Exception:
         return None
@@ -146,7 +145,6 @@ def home():
     if request.method == "POST":
         user_input = request.form.get("user_input", "").strip()
         if user_input:
-            # Greetings, Thanks, Goodbye, Jokes
             if fuzzy_match(greeting_triggers, user_input):
                 response = generate_greeting()
             elif fuzzy_match(goodbye_triggers, user_input):
@@ -156,31 +154,24 @@ def home():
             elif fuzzy_match(joke_triggers, user_input):
                 response = generate_joke()
 
-            # Knowledge Queries
             elif any(phrase in user_input.lower() for phrase in knowledge_triggers):
                 topic = extract_topic(user_input)
-
-                # First try Wikipedia API summary
                 response = wiki_summary(topic)
                 if not response:
                     response = wikiapi_summary(topic)
                 if not response:
                     response = duckduckgo_search(topic)
                 if not response:
-                    # Try wordnet for definitions if topic is single word
                     if len(topic.split()) == 1:
                         response = wordnet_definition(topic.lower())
                 if not response:
-                    # Try pywhatkit info fallback
                     response = pywhatkit_info(topic)
                 if not response:
                     response = f"Sorry, I couldn't find much about '{topic}'. Try asking something else."
 
-            # Math solving check (simple contains '=' or expression)
             elif "=" in user_input or any(op in user_input for op in ['+', '-', '*', '/', '^']):
                 response = sympy_solve(user_input)
 
-            # Spell correction check (only if input is short)
             elif len(user_input.split()) < 6:
                 corrected = spell_correct(user_input)
                 if corrected.lower() != user_input.lower():
