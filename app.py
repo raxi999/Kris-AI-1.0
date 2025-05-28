@@ -55,7 +55,7 @@ def extract_topic(user_input):
     for phrase in knowledge_triggers:
         if phrase in lowered:
             topic = lowered.split(phrase, 1)[-1]
-            topic = re.sub(r'[^\w\s]', '', topic).strip()
+            topic = re.sub(r'[^\w\s]', '', topic).strip()  # remove punctuation
             return topic.title()
     return user_input.strip(" ?.!").title()
 
@@ -89,15 +89,9 @@ def generate_joke():
 # --- Knowledge Sources ---
 def wiki_summary(topic):
     try:
-        search_results = wikipedia.search(topic)
-        if not search_results:
-            return None
-        best_match = difflib.get_close_matches(topic, search_results, n=1, cutoff=0.6)
-        if not best_match:
-            return None
-        page_title = best_match[0]
-        summary = wikipedia.summary(page_title, sentences=2)
-        return rephrase_summary(summary, page_title)
+        logging.debug(f"Searching Wikipedia for: {topic}")
+        summary = wikipedia.summary(topic, sentences=2)
+        return rephrase_summary(summary, topic)
     except wikipedia.exceptions.DisambiguationError as e:
         return f"🤔 '{topic}' is a broad term. Did you mean:\n\n- " + "\n- ".join(e.options[:5])
     except wikipedia.exceptions.PageError:
@@ -146,10 +140,6 @@ def pywhatkit_info(topic):
 def spell_correct(text):
     return str(TextBlob(text).correct())
 
-def nlp_entities(text):
-    doc = nlp(text)
-    return [(ent.text, ent.label_) for ent in doc.ents]
-
 def huggingface_qa(question, context):
     try:
         answer = qa_pipeline(question=question, context=context)
@@ -175,7 +165,7 @@ def home():
             elif fuzzy_match(joke_triggers, user_input):
                 response = generate_joke()
 
-            elif fuzzy_match(knowledge_triggers, user_input):
+            elif any(phrase in user_input.lower() for phrase in knowledge_triggers):
                 topic = extract_topic(user_input)
                 logging.debug(f"Extracted topic: {topic}")
                 response = wiki_summary(topic)
@@ -183,9 +173,8 @@ def home():
                     response = wikiapi_summary(topic)
                 if not response:
                     response = duckduckgo_search(topic)
-                if not response:
-                    if len(topic.split()) == 1:
-                        response = wordnet_definition(topic.lower())
+                if not response and len(topic.split()) == 1:
+                    response = wordnet_definition(topic.lower())
                 if not response:
                     response = pywhatkit_info(topic)
                 if not response:
@@ -206,5 +195,6 @@ def home():
 
     return render_template("index.html", user_input=user_input, response=response)
 
+# ✅ Standard Python entry point
 if __name__ == "__main__":
     app.run(debug=True)
