@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template
 import wikipedia
-from duckduckgo_search import ddg  # Changed import here
+from duckduckgo_search import ddg
 from nltk.corpus import wordnet
 import sympy
 import pywhatkit
@@ -11,6 +11,8 @@ from transformers import pipeline
 import wikipediaapi
 import random
 import difflib
+import re
+import logging
 
 app = Flask(__name__)
 
@@ -20,7 +22,11 @@ nlp = spacy.load("en_core_web_sm")
 # Load transformers QA pipeline
 qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
 
+# Wikipedia API
 wiki_api = wikipediaapi.Wikipedia('en')
+
+# Enable logging
+logging.basicConfig(level=logging.DEBUG)
 
 # --- Triggers ---
 knowledge_triggers = [
@@ -48,7 +54,9 @@ def extract_topic(user_input):
     lowered = user_input.lower()
     for phrase in knowledge_triggers:
         if phrase in lowered:
-            return lowered.split(phrase, 1)[-1].strip(" ?.!").title()
+            topic = lowered.split(phrase, 1)[-1]
+            topic = re.sub(r'[^\w\s]', '', topic).strip()  # remove punctuation
+            return topic.title()
     return user_input.strip(" ?.!").title()
 
 def rephrase_summary(summary, topic):
@@ -81,9 +89,15 @@ def generate_joke():
 # --- Knowledge Sources ---
 def wiki_summary(topic):
     try:
+        logging.debug(f"Searching Wikipedia for: {topic}")
         summary = wikipedia.summary(topic, sentences=2)
         return rephrase_summary(summary, topic)
-    except Exception:
+    except wikipedia.exceptions.DisambiguationError as e:
+        return f"🤔 '{topic}' is a broad term. Did you mean:\n\n- " + "\n- ".join(e.options[:5])
+    except wikipedia.exceptions.PageError:
+        return None
+    except Exception as e:
+        logging.debug(f"Wikipedia error: {e}")
         return None
 
 def wikiapi_summary(topic):
@@ -96,7 +110,6 @@ def wikiapi_summary(topic):
 def duckduckgo_search(topic):
     results = ddg(topic, max_results=3)
     if results:
-        # Extract the 'body' snippet from each result if available
         snippets = [res.get('body', '') for res in results if 'body' in res]
         return " ".join(snippets)
     return None
@@ -158,6 +171,7 @@ def home():
 
             elif any(phrase in user_input.lower() for phrase in knowledge_triggers):
                 topic = extract_topic(user_input)
+                logging.debug(f"Extracted topic: {topic}")
                 response = wiki_summary(topic)
                 if not response:
                     response = wikiapi_summary(topic)
@@ -169,7 +183,7 @@ def home():
                 if not response:
                     response = pywhatkit_info(topic)
                 if not response:
-                    response = f"Sorry, I couldn't find much about '{topic}'. Try asking something else."
+                    response = f"😕 I couldn’t find reliable info on **{topic}**. Try rephrasing or ask about something else."
 
             elif "=" in user_input or any(op in user_input for op in ['+', '-', '*', '/', '^']):
                 response = sympy_solve(user_input)
