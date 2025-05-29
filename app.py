@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from flask import Flask, request, render_template, Markup
 import wikipedia
 from duckduckgo_search import DDGS
@@ -67,13 +68,13 @@ def extract_topic(user_input):
 
 def rephrase_summary(summary, topic):
     intros = [
-        f"Sure! Here's what I found about {topic}:",
+        f"Here's what I found about {topic}:",
         f"Let me explain {topic} in simple words:",
-        f"Of course! So, {topic} is...",
+        f"So, {topic} is...",
         f"Here's a quick overview of {topic}:",
-        f"Glad you asked! {topic} can be described as:",
-        f"Alright! Here's something about {topic}:",
-        f"Basically, {topic} is known for..."
+        f"{topic} can be described as:",
+        f"Here's something about {topic}:",
+        f"{topic} is known for..."
     ]
     return f"{random.choice(intros)} {summary}"
 
@@ -97,7 +98,7 @@ def wiki_summary(topic):
         return rephrase_summary(summary, topic)
     except wikipedia.exceptions.DisambiguationError as e:
         options = "\n- ".join(e.options[:5])
-        return f"🤔 '{topic}' has multiple meanings. Did you mean:\n- {options}"
+        return f"'{topic}' has multiple meanings. Did you mean:\n- {options}"
     except wikipedia.exceptions.PageError:
         return None
     except Exception as e:
@@ -115,7 +116,7 @@ def duckduckgo_search(topic):
         with DDGS() as ddgs:
             results = ddgs.text(topic, max_results=3)
             snippets = [res["body"] for res in results if "body" in res]
-            return f"🔎 From web: {' '.join(snippets)}" if snippets else None
+            return f"From the web: {' '.join(snippets)}" if snippets else None
     except Exception as e:
         logging.debug(f"DDG error: {e}")
         return None
@@ -123,7 +124,7 @@ def duckduckgo_search(topic):
 def wordnet_definition(word):
     synsets = wordnet.synsets(word)
     if synsets:
-        return f"📘 WordNet: {synsets[0].definition()}"
+        return f"WordNet: {synsets[0].definition()}"
     return None
 
 def sympy_solve(expr):
@@ -174,17 +175,17 @@ def home():
                 if not response:
                     response = pywhatkit_info(topic)
                 if not response:
-                    response = f"😕 Sorry, I couldn’t find solid info about **{topic}**. Try rephrasing or asking something else."
+                    response = f"Sorry, I couldn’t find solid info about {topic}. Try rephrasing or asking something else."
             elif "=" in user_input or any(op in user_input for op in ['+', '-', '*', '/', '^']):
                 response = sympy_solve(user_input)
             elif len(user_input.split()) < 6:
                 corrected = spell_correct(user_input)
                 if corrected.lower() != user_input.lower():
-                    response = f"🤔 Did you mean: '{corrected}'?"
+                    response = f"Did you mean: '{corrected}'?"
                 else:
                     response = "I'm not sure what you meant. Can you rephrase it?"
             else:
-                response = "Hmm... I'm still learning. Try asking a question or say 'who is Allu Arjun'."
+                response = "I'm still learning. Try asking a question like 'who is Allu Arjun'."
 
     return render_template("index.html", user_input=user_input, response=Markup(html.escape(response)) if response else "")
 
