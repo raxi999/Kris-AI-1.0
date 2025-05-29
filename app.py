@@ -188,5 +188,6 @@ def home():
 
     return render_template("index.html", user_input=user_input, response=Markup(html.escape(response)) if response else "")
 
+# --- Run the App ---
 if __name__ == "__main__":
     app.run(debug=True)
