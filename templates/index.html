@@ -5,10 +5,202 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Kris AI</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+  <style>
+    /* Base reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background-color: #0e1a2b;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .chat-container {
+      display: flex;
+      flex-direction: column;
+      max-width: 600px;
+      margin: auto;
+      padding: 1rem;
+      height: 100vh;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .branding h1 {
+      font-size: 1.8rem;
+      color: #64c9ff;
+    }
+
+    .branding p {
+      font-size: 0.9rem;
+      color: #bbb;
+    }
+
+    .kris-face-wrapper {
+      width: 60px;
+      height: 60px;
+      position: relative;
+    }
+
+    .kris-face {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #3fa9f5, #2468b2);
+      border-radius: 50%;
+      position: relative;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    .feather {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      width: 15px;
+      height: 25px;
+      background: linear-gradient(135deg, #00ffcc, #0077ff);
+      border-radius: 50% 50% 0 0;
+      transform: rotate(-30deg);
+      animation: wave 2s infinite ease-in-out;
+    }
+
+    .eyes {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      display: flex;
+      gap: 10px;
+      transform: translateX(-50%);
+    }
+
+    .eye {
+      width: 8px;
+      height: 8px;
+      background: black;
+      border-radius: 50%;
+    }
+
+    .mouth {
+      position: absolute;
+      bottom: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .default-mouth {
+      width: 14px;
+      height: 4px;
+      background: black;
+      border-radius: 10px;
+    }
+
+    @keyframes wave {
+      0%, 100% { transform: rotate(-30deg); }
+      50% { transform: rotate(-45deg); }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    .chat-box {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      padding: 1rem;
+      background-color: #1a2b3d;
+      border-radius: 10px;
+    }
+
+    .message {
+      padding: 0.7rem 1rem;
+      border-radius: 20px;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+
+    .user {
+      align-self: flex-end;
+      background-color: #4682b4;
+    }
+
+    .bot {
+      align-self: flex-start;
+      background-color: #2e8b57;
+    }
+
+    form {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 0.8rem 1rem;
+      border: none;
+      border-radius: 20px;
+      font-size: 1rem;
+    }
+
+    button {
+      padding: 0.8rem 1.2rem;
+      border: none;
+      background-color: #64c9ff;
+      color: #000;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #36b1ee;
+    }
+
+    @media (max-height: 500px) {
+      .chat-box {
+        padding-bottom: 100px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .chat-container {
+        padding: 0.5rem;
+      }
+
+      .branding h1 {
+        font-size: 1.3rem;
+      }
+
+      .kris-face-wrapper {
+        width: 50px;
+        height: 50px;
+      }
+
+      .default-mouth {
+        width: 10px;
+        height: 3px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="chat-container">
-
     <!-- Top bar -->
     <div class="top-bar">
       <div class="branding">
@@ -16,7 +208,7 @@
         <p>Your personal assistant</p>
       </div>
       <div class="kris-face-wrapper">
-        <div class="kris-face">
+        <div class="kris-face mood-default">
           <div class="feather"></div>
           <div class="eyes">
             <div class="eye"></div>
@@ -42,11 +234,10 @@
     <!-- Input form -->
     <form method="POST">
       <input type="text" name="user_input" placeholder="Type your message..." autocomplete="off" required />
-      <button type="submit" aria-label="Send message">
+      <button type="submit">
         <span>Send</span>
       </button>
     </form>
-
   </div>
 </body>
 </html>
