@@ -1,7 +1,6 @@
-# --- START of upgraded app.py ---
 from flask import Flask, request, render_template
 import wikipedia
-from duckduckgo_search import ddg
+from duckduckgo_search import DDGS
 from nltk.corpus import wordnet
 import sympy
 import pywhatkit
@@ -99,11 +98,14 @@ def wikiapi_summary(topic):
     return None
 
 def duckduckgo_search(topic):
-    results = ddg(topic, max_results=3)
-    if results:
-        snippets = [res.get('body', '') for res in results if 'body' in res]
-        return f"🔎 From web: {' '.join(snippets)}"
-    return None
+    try:
+        with DDGS() as ddgs:
+            results = ddgs.text(topic, max_results=3)
+            snippets = [res["body"] for res in results if "body" in res]
+            return f"🔎 From web: {' '.join(snippets)}" if snippets else None
+    except Exception as e:
+        logging.debug(f"DDG error: {e}")
+        return None
 
 def wordnet_definition(word):
     synsets = wordnet.synsets(word)
@@ -179,4 +181,3 @@ def home():
 
 if __name__ == "__main__":
     app.run(debug=True)
-# --- END of upgraded app.py ---
