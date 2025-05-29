@@ -1,45 +1,41 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, Markup
 import wikipedia
 from duckduckgo_search import DDGS
 from nltk.corpus import wordnet
+import nltk
 import sympy
+import pywhatkit
+import pyjokes
+import spacy
+from textblob import TextBlob
+from transformers import pipeline
+import wikipediaapi
 import random
 import difflib
 import re
 import logging
-import wikipediaapi
+import html
 
-# Optional/unstable imports — use try/except to avoid crashing on Render
-try:
-    import pywhatkit
-except ImportError:
-    pywhatkit = None
+# --- Initial Setup ---
+app = Flask(__name__)
+logging.basicConfig(level=logging.DEBUG)
 
+# --- Downloads ---
 try:
-    import pyjokes
-except ImportError:
-    pyjokes = None
+    nltk.data.find('corpora/wordnet')
+except LookupError:
+    nltk.download('wordnet')
 
+# --- Load NLP Models ---
 try:
-    from textblob import TextBlob
-except ImportError:
-    TextBlob = None
-
-try:
-    import spacy
     nlp = spacy.load("en_core_web_sm")
 except:
-    nlp = None
+    from spacy.cli import download
+    download("en_core_web_sm")
+    nlp = spacy.load("en_core_web_sm")
 
-try:
-    from transformers import pipeline
-    qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
-except:
-    qa_pipeline = None
-
-app = Flask(__name__)
+qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
 wiki_api = wikipediaapi.Wikipedia('en')
-logging.basicConfig(level=logging.DEBUG)
 
 # --- Trigger Words ---
 knowledge_triggers = [
@@ -56,9 +52,7 @@ joke_triggers = ["joke", "funny", "make me laugh"]
 def fuzzy_match(phrase_list, user_input):
     lowered = user_input.lower()
     for phrase in phrase_list:
-        if phrase in lowered:
-            return True
-        if difflib.get_close_matches(lowered, [phrase], cutoff=0.75):
+        if phrase in lowered or difflib.get_close_matches(lowered, [phrase], cutoff=0.75):
             return True
     return False
 
@@ -93,9 +87,7 @@ def generate_thanks_reply():
     return random.choice(["You're welcome!", "No problem!", "Anytime!", "Glad to help!", "My pleasure!"])
 
 def generate_joke():
-    if pyjokes:
-        return pyjokes.get_joke()
-    return "Sorry, I can't tell jokes right now."
+    return pyjokes.get_joke()
 
 # --- Knowledge Functions ---
 def wiki_summary(topic):
@@ -143,17 +135,13 @@ def sympy_solve(expr):
         return None
 
 def pywhatkit_info(topic):
-    if pywhatkit:
-        try:
-            return pywhatkit.info(topic, lines=2)
-        except Exception:
-            return None
-    return None
+    try:
+        return pywhatkit.info(topic, lines=2)
+    except Exception:
+        return None
 
 def spell_correct(text):
-    if TextBlob:
-        return str(TextBlob(text).correct())
-    return text
+    return str(TextBlob(text).correct())
 
 # --- Main Route ---
 @app.route("/", methods=["GET", "POST"])
@@ -173,7 +161,6 @@ def home():
                 response = generate_thanks_reply()
             elif fuzzy_match(joke_triggers, user_input):
                 response = generate_joke()
-
             elif any(phrase in user_input.lower() for phrase in knowledge_triggers):
                 topic = extract_topic(user_input)
                 logging.debug(f"Extracted topic: {topic}")
@@ -188,21 +175,18 @@ def home():
                     response = pywhatkit_info(topic)
                 if not response:
                     response = f"😕 Sorry, I couldn’t find solid info about **{topic}**. Try rephrasing or asking something else."
-
             elif "=" in user_input or any(op in user_input for op in ['+', '-', '*', '/', '^']):
                 response = sympy_solve(user_input)
-
             elif len(user_input.split()) < 6:
                 corrected = spell_correct(user_input)
                 if corrected.lower() != user_input.lower():
                     response = f"🤔 Did you mean: '{corrected}'?"
                 else:
                     response = "I'm not sure what you meant. Can you rephrase it?"
-
             else:
                 response = "Hmm... I'm still learning. Try asking a question or say 'who is Allu Arjun'."
 
-    return render_template("index.html", user_input=user_input, response=response)
+    return render_template("index.html", user_input=user_input, response=Markup(html.escape(response)) if response else "")
 
 if __name__ == "__main__":
     app.run(debug=True)
