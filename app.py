@@ -1,3 +1,4 @@
+# --- START of upgraded app.py ---
 from flask import Flask, request, render_template
 import wikipedia
 from duckduckgo_search import ddg
@@ -16,19 +17,13 @@ import logging
 
 app = Flask(__name__)
 
-# Load SpaCy model
 nlp = spacy.load("en_core_web_sm")
-
-# Load transformers QA pipeline
 qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
-
-# Wikipedia API
 wiki_api = wikipediaapi.Wikipedia('en')
 
-# Enable logging
 logging.basicConfig(level=logging.DEBUG)
 
-# --- Triggers ---
+# --- Trigger Words ---
 knowledge_triggers = [
     "tell me about", "who is", "what is", "what's", "whats", "explain",
     "can you explain", "could you explain", "do you know about", "give me information about",
@@ -39,14 +34,13 @@ thanks_triggers = ["thanks", "thank you", "thx"]
 goodbye_triggers = ["bye", "goodbye", "see you", "see ya", "cya"]
 joke_triggers = ["joke", "funny", "make me laugh"]
 
-# --- Utils ---
+# --- Utilities ---
 def fuzzy_match(phrase_list, user_input):
     lowered = user_input.lower()
     for phrase in phrase_list:
         if phrase in lowered:
             return True
-        close = difflib.get_close_matches(lowered, [phrase], cutoff=0.75)
-        if close:
+        if difflib.get_close_matches(lowered, [phrase], cutoff=0.75):
             return True
     return False
 
@@ -55,7 +49,7 @@ def extract_topic(user_input):
     for phrase in knowledge_triggers:
         if phrase in lowered:
             topic = lowered.split(phrase, 1)[-1]
-            topic = re.sub(r'[^\w\s]', '', topic).strip()  # remove punctuation
+            topic = re.sub(r'[^\w\s]', '', topic).strip()
             return topic.title()
     return user_input.strip(" ?.!").title()
 
@@ -72,28 +66,26 @@ def rephrase_summary(summary, topic):
     return f"{random.choice(intros)} {summary}"
 
 def generate_greeting():
-    replies = ["Hey there!", "Hi!", "Namaste!", "Yo! How can I help?", "Hello friend!"]
-    return random.choice(replies)
+    return random.choice(["Hey there!", "Hi!", "Namaste!", "Yo! How can I help?", "Hello friend!"])
 
 def generate_goodbye():
-    replies = ["Goodbye!", "See you soon!", "Take care!", "Bye-bye!", "See ya!"]
-    return random.choice(replies)
+    return random.choice(["Goodbye!", "See you soon!", "Take care!", "Bye-bye!", "See ya!"])
 
 def generate_thanks_reply():
-    replies = ["You're welcome!", "No problem!", "Anytime!", "Glad to help!", "My pleasure!"]
-    return random.choice(replies)
+    return random.choice(["You're welcome!", "No problem!", "Anytime!", "Glad to help!", "My pleasure!"])
 
 def generate_joke():
     return pyjokes.get_joke()
 
-# --- Knowledge Sources ---
+# --- Knowledge Functions ---
 def wiki_summary(topic):
     try:
-        logging.debug(f"Searching Wikipedia for: {topic}")
+        logging.debug(f"Wikipedia search for: {topic}")
         summary = wikipedia.summary(topic, sentences=2)
         return rephrase_summary(summary, topic)
     except wikipedia.exceptions.DisambiguationError as e:
-        return f"🤔 '{topic}' is a broad term. Did you mean:\n\n- " + "\n- ".join(e.options[:5])
+        options = "\n- ".join(e.options[:5])
+        return f"🤔 '{topic}' has multiple meanings. Did you mean:\n- {options}"
     except wikipedia.exceptions.PageError:
         return None
     except Exception as e:
@@ -103,31 +95,27 @@ def wiki_summary(topic):
 def wikiapi_summary(topic):
     page = wiki_api.page(topic)
     if page.exists():
-        text = page.summary[0:500]
-        return rephrase_summary(text, topic)
+        return rephrase_summary(page.summary[:400], topic)
     return None
 
 def duckduckgo_search(topic):
     results = ddg(topic, max_results=3)
     if results:
         snippets = [res.get('body', '') for res in results if 'body' in res]
-        return " ".join(snippets)
+        return f"🔎 From web: {' '.join(snippets)}"
     return None
 
 def wordnet_definition(word):
     synsets = wordnet.synsets(word)
     if synsets:
-        return synsets[0].definition()
+        return f"📘 WordNet: {synsets[0].definition()}"
     return None
 
 def sympy_solve(expr):
     try:
         x = sympy.symbols('x')
         solution = sympy.solve(expr, x)
-        if solution:
-            return f"The solution to the equation is: {solution}"
-        else:
-            return "I couldn't solve the equation."
+        return f"The solution to the equation is: {solution}" if solution else "I couldn't solve the equation."
     except Exception:
         return None
 
@@ -140,14 +128,7 @@ def pywhatkit_info(topic):
 def spell_correct(text):
     return str(TextBlob(text).correct())
 
-def huggingface_qa(question, context):
-    try:
-        answer = qa_pipeline(question=question, context=context)
-        return answer['answer']
-    except Exception:
-        return None
-
-# --- Routes ---
+# --- Main Route ---
 @app.route("/", methods=["GET", "POST"])
 def home():
     user_input = None
@@ -155,6 +136,7 @@ def home():
 
     if request.method == "POST":
         user_input = request.form.get("user_input", "").strip()
+
         if user_input:
             if fuzzy_match(greeting_triggers, user_input):
                 response = generate_greeting()
@@ -178,7 +160,7 @@ def home():
                 if not response:
                     response = pywhatkit_info(topic)
                 if not response:
-                    response = f"😕 I couldn’t find reliable info on **{topic}**. Try rephrasing or ask about something else."
+                    response = f"😕 Sorry, I couldn’t find solid info about **{topic}**. Try rephrasing or asking something else."
 
             elif "=" in user_input or any(op in user_input for op in ['+', '-', '*', '/', '^']):
                 response = sympy_solve(user_input)
@@ -186,15 +168,15 @@ def home():
             elif len(user_input.split()) < 6:
                 corrected = spell_correct(user_input)
                 if corrected.lower() != user_input.lower():
-                    response = f"Did you mean: '{corrected}'?"
+                    response = f"🤔 Did you mean: '{corrected}'?"
                 else:
-                    response = "I'm not sure about that. Can you rephrase?"
+                    response = "I'm not sure what you meant. Can you rephrase it?"
 
             else:
-                response = "Hmm... I'm still learning. Try asking about a topic or say hi!"
+                response = "Hmm... I'm still learning. Try asking a question or say 'who is Allu Arjun'."
 
     return render_template("index.html", user_input=user_input, response=response)
 
-# ✅ Standard Python entry point
 if __name__ == "__main__":
     app.run(debug=True)
+# --- END of upgraded app.py ---
