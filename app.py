@@ -3,23 +3,42 @@ import wikipedia
 from duckduckgo_search import DDGS
 from nltk.corpus import wordnet
 import sympy
-import pywhatkit
-import pyjokes
-import spacy
-from textblob import TextBlob
-from transformers import pipeline
-import wikipediaapi
 import random
 import difflib
 import re
 import logging
+import wikipediaapi
+
+# Optional/unstable imports — use try/except to avoid crashing on Render
+try:
+    import pywhatkit
+except ImportError:
+    pywhatkit = None
+
+try:
+    import pyjokes
+except ImportError:
+    pyjokes = None
+
+try:
+    from textblob import TextBlob
+except ImportError:
+    TextBlob = None
+
+try:
+    import spacy
+    nlp = spacy.load("en_core_web_sm")
+except:
+    nlp = None
+
+try:
+    from transformers import pipeline
+    qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
+except:
+    qa_pipeline = None
 
 app = Flask(__name__)
-
-nlp = spacy.load("en_core_web_sm")
-qa_pipeline = pipeline("question-answering", model="distilbert-base-cased-distilled-squad")
 wiki_api = wikipediaapi.Wikipedia('en')
-
 logging.basicConfig(level=logging.DEBUG)
 
 # --- Trigger Words ---
@@ -74,7 +93,9 @@ def generate_thanks_reply():
     return random.choice(["You're welcome!", "No problem!", "Anytime!", "Glad to help!", "My pleasure!"])
 
 def generate_joke():
-    return pyjokes.get_joke()
+    if pyjokes:
+        return pyjokes.get_joke()
+    return "Sorry, I can't tell jokes right now."
 
 # --- Knowledge Functions ---
 def wiki_summary(topic):
@@ -122,13 +143,17 @@ def sympy_solve(expr):
         return None
 
 def pywhatkit_info(topic):
-    try:
-        return pywhatkit.info(topic, lines=2)
-    except Exception:
-        return None
+    if pywhatkit:
+        try:
+            return pywhatkit.info(topic, lines=2)
+        except Exception:
+            return None
+    return None
 
 def spell_correct(text):
-    return str(TextBlob(text).correct())
+    if TextBlob:
+        return str(TextBlob(text).correct())
+    return text
 
 # --- Main Route ---
 @app.route("/", methods=["GET", "POST"])
