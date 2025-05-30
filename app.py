@@ -5,7 +5,6 @@ from duckduckgo_search import DDGS
 from nltk.corpus import wordnet
 import nltk
 import sympy
-import pywhatkit
 import pyjokes
 import spacy
 from textblob import TextBlob
@@ -16,6 +15,7 @@ import difflib
 import re
 import logging
 import html
+import os
 
 # --- Initial Setup ---
 app = Flask(__name__)
@@ -93,7 +93,6 @@ def generate_joke():
 # --- Knowledge Functions ---
 def wiki_summary(topic):
     try:
-        logging.debug(f"Wikipedia search for: {topic}")
         summary = wikipedia.summary(topic, sentences=2)
         return rephrase_summary(summary, topic)
     except wikipedia.exceptions.DisambiguationError as e:
@@ -137,8 +136,10 @@ def sympy_solve(expr):
 
 def pywhatkit_info(topic):
     try:
+        import pywhatkit  # moved inside to avoid issues during startup
         return pywhatkit.info(topic, lines=2)
-    except Exception:
+    except Exception as e:
+        logging.debug(f"pywhatkit error: {e}")
         return None
 
 def spell_correct(text):
@@ -148,47 +149,3 @@ def spell_correct(text):
 @app.route("/", methods=["GET", "POST"])
 def home():
     user_input = None
-    response = None
-
-    if request.method == "POST":
-        user_input = request.form.get("user_input", "").strip()
-
-        if user_input:
-            if fuzzy_match(greeting_triggers, user_input):
-                response = generate_greeting()
-            elif fuzzy_match(goodbye_triggers, user_input):
-                response = generate_goodbye()
-            elif fuzzy_match(thanks_triggers, user_input):
-                response = generate_thanks_reply()
-            elif fuzzy_match(joke_triggers, user_input):
-                response = generate_joke()
-            elif any(phrase in user_input.lower() for phrase in knowledge_triggers):
-                topic = extract_topic(user_input)
-                logging.debug(f"Extracted topic: {topic}")
-                response = wiki_summary(topic)
-                if not response:
-                    response = wikiapi_summary(topic)
-                if not response:
-                    response = duckduckgo_search(topic)
-                if not response and len(topic.split()) == 1:
-                    response = wordnet_definition(topic.lower())
-                if not response:
-                    response = pywhatkit_info(topic)
-                if not response:
-                    response = f"Sorry, I couldn’t find solid info about {topic}. Try rephrasing or asking something else."
-            elif "=" in user_input or any(op in user_input for op in ['+', '-', '*', '/', '^']):
-                response = sympy_solve(user_input)
-            elif len(user_input.split()) < 6:
-                corrected = spell_correct(user_input)
-                if corrected.lower() != user_input.lower():
-                    response = f"Did you mean: '{corrected}'?"
-                else:
-                    response = "I'm not sure what you meant. Can you rephrase it?"
-            else:
-                response = "I'm still learning. Try asking a question like 'who is Allu Arjun'."
-
-    return render_template("index.html", user_input=user_input, response=Markup(html.escape(response)) if response else "")
-
-# --- Run the App ---
-if __name__ == "__main__":
-    app.run(debug=True)
