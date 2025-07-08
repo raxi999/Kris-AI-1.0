@@ -1,95 +1,53 @@
-from flask import Flask, render_template, request
-from googletrans import Translator
-import requests
-import os
+from flask import Flask, render_template, request, jsonify import wikipedia import uuid import os
 
-app = Flask(__name__)
-translator = Translator()
-chat_log = []  # Short-term memory
+app = Flask(name)
 
-# --- Your source code snippets ---
-html_code = open("templates/index.html", "r", encoding="utf-8").read()
-css_code = open("static/css/style.css", "r", encoding="utf-8").read()
-python_code = open("app.py", "r", encoding="utf-8").read()
+Image generation stub (placeholder for local or external API call)
 
-# --- Image generation using Hugging Face ---
-HF_TOKEN = os.getenv("HF_TOKEN")  # Set as environment variable
+def generate_image(prompt): return f"https://dummyimage.com/512x512/4da6ff/ffffff.png&text={prompt.replace(' ', '+')[:20]}"
 
-def generate_image_url(prompt):
-    api_url = "https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2"
-    headers = {"Authorization": f"Bearer {HF_TOKEN}"}
-    response = requests.post(api_url, headers=headers, json={"inputs": prompt})
-    if response.status_code == 200:
-        return "🖼️ Image generated. (HuggingFace returned raw data – customize logic here)"
-    else:
-        return "❌ Error generating image. Try again later."
+Core reply logic with mood triggers and smart keyword detection
 
-# --- Smart Kris Brain ---
-def smart_kris_reply(msg):
-    msg = msg.lower()
+def generate_response(prompt): prompt_lower = prompt.lower()
 
-    # Save to short-term memory
-    chat_log.append(msg)
-    if len(chat_log) > 5:
-        chat_log.pop(0)
+# Mood-based greetings
+if any(greet in prompt_lower for greet in ['hello', 'hi', 'namaste']):
+    return "Namaste 🙏! I'm Kris AI — your intelligent buddy with a feathered mind! Ask me anything 😊"
 
-    # Triggers for code sharing
-    if "give your python code" in msg or "app.py" in msg:
-        return f"Here is my Python backend code:\n\n```python\n{python_code}```"
+# Provide Kris's own codes
+elif 'give your python code' in prompt_lower:
+    with open('app.py', 'r') as f:
+        return f.read()
+elif 'html code' in prompt_lower:
+    with open('templates/index.html', 'r') as f:
+        return f.read()
+elif 'css code' in prompt_lower:
+    with open('static/css/style.css', 'r') as f:
+        return f.read()
 
-    elif "html code" in msg:
-        return f"Here's my HTML code:\n\n```html\n{html_code}```"
+# Wikipedia question handling
+elif any(kw in prompt_lower for kw in ["what is", "who is", "tell me about", "explain", "define", "i want to know about"]):
+    try:
+        topic = prompt_lower
+        for phrase in ["what is", "who is", "tell me about", "explain", "define", "i want to know about"]:
+            topic = topic.replace(phrase, '')
+        summary = wikipedia.summary(topic.strip(), sentences=2)
+        return summary
+    except:
+        return "Hmm... I couldn't find anything on that. Want to try rephrasing it? 🤔"
 
-    elif "css code" in msg:
-        return f"Here's my CSS styling code:\n\n```css\n{css_code}```"
+# Image generation trigger
+elif 'generate image of' in prompt_lower:
+    prompt = prompt_lower.split('generate image of')[-1].strip()
+    image_url = generate_image(prompt)
+    return f"Here is your image: <img src='{image_url}' alt='generated image' width='256'>"
 
-    # Image generation
-    elif "generate image of" in msg or "draw" in msg or "make image" in msg:
-        prompt = msg.replace("generate image of", "").replace("draw", "").replace("make image", "").strip()
-        return generate_image_url(prompt)
+# Default response
+return "I'm still learning! Try asking a question or say 'give your python code' to see my brain 🧠."
 
-    # Greetings
-    elif "hi" in msg or "hello" in msg:
-        return "😊 Hello! I'm Kris AI, your intelligent assistant with mood, memory, and creativity!"
+@app.route('/') def index(): return render_template('index.html')
 
-    # About Kris
-    elif "who are you" in msg or "your intro" in msg or "what is kris" in msg:
-        return (
-            "👋 I’m **Kris AI**, your smart assistant made by Yashwanth.\n\n"
-            "💡 I can:\n"
-            "- Understand your questions\n"
-            "- Reply with mood\n"
-            "- Share my own code\n"
-            "- Generate AI images\n"
-            "- Speak in your language\n"
-            "- Evolve with time 😎\n\n"
-            "Ask me: *Give your Python code*, *Generate image of a robot*, *Tell your intro*, or *Say this in Telugu*!"
-        )
+@app.route('/chat', methods=['POST']) def chat(): data = request.get_json() prompt = data.get('prompt', '') response = generate_response(prompt) return jsonify({'response': response})
 
-    # Multilingual trigger
-    elif "say this in telugu" in msg:
-        base = msg.replace("say this in telugu", "").strip()
-        translated = translator.translate(base, dest="te").text
-        return f"📣 In Telugu:\n{translated}"
+if name == 'main': app.run(debug=True)
 
-    elif "say this in hindi" in msg:
-        base = msg.replace("say this in hindi", "").strip()
-        translated = translator.translate(base, dest="hi").text
-        return f"📣 In Hindi:\n{translated}"
-
-    # Fallback
-    else:
-        return "🤔 I'm still learning. Try asking for my code, intro, or an image!"
-
-# --- Routes ---
-@app.route("/", methods=["GET", "POST"])
-def index():
-    if request.method == "POST":
-        user_msg = request.form["message"]
-        reply = smart_kris_reply(user_msg)
-        return {"reply": reply}
-    return render_template("index.html")
-
-# --- Run Server ---
-if __name__ == "__main__":
-    app.run(debug=True)
