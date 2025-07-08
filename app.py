@@ -1,7 +1,6 @@
 from flask import Flask, render_template, request
 import wikipedia
-from duckduckgo_search import ddg
-import os
+from duckduckgo_search import DuckDuckGoSearch
 import uuid
 
 app = Flask(__name__)
@@ -12,7 +11,13 @@ study_keywords = ['study', 'focus', 'read']
 motivation_keywords = ['tired', 'lazy', 'no energy']
 fact_keywords = ['who is', 'what is', 'when did', 'explain', 'information', 'details']
 image_keywords = ['generate image of', 'draw', 'create image of']
-wiki_phrases = ['who is', 'what is', 'tell me about', 'explain', 'information about', 'details about']
+wiki_phrases = [
+    'who is', 'what is', 'tell me about', 'explain',
+    'information about', 'details about', 'can you tell me about',
+    'give me information about', 'i want to know about', 'do you know about',
+    'please explain', 'what are', 'who are', 'information on',
+    "what's", "whats", "what's the", "whats the"
+]
 code_triggers = {
     'python code': 'python',
     'html code': 'html',
@@ -87,12 +92,13 @@ def get_wiki_or_ddg_answer(query):
         return wikipedia.summary(query, sentences=2)
     except:
         try:
-            results = ddg(query, max_results=1)
+            search = DuckDuckGoSearch()
+            results = search.text(query, max_results=1)
             if results:
                 return results[0]['body'] or f"Here's something I found: {results[0]['href']}"
             return "I couldn't find anything useful."
-        except:
-            return "I'm having trouble searching. Try again soon."
+        except Exception as e:
+            return f"I'm having trouble searching. Try again soon. ({str(e)})"
 
 # Simulated image generation
 def generate_image_response(prompt):
