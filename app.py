@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request
 import wikipedia
-from duckduckgo_search import DuckDuckGoSearch
+from duckduckgo_search import DDGS
 import uuid
 
 app = Flask(__name__)
@@ -43,11 +43,11 @@ def get_summary(query):
         return wikipedia.summary(query, sentences=2)
     except:
         try:
-            search = DuckDuckGoSearch()
-            results = search.text(query, max_results=1)
-            if results:
-                return results[0]['body'] or f"Link: {results[0]['href']}"
-            return "I couldn't find anything useful."
+            with DDGS() as ddgs:
+                results = ddgs.text(query, max_results=1)
+                if results:
+                    return results[0]['body'] or f"Link: {results[0]['href']}"
+                return "I couldn't find anything useful."
         except Exception as e:
             return f"Search failed. ({str(e)})"
 
