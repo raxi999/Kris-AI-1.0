@@ -5,12 +5,10 @@ import uuid
 
 app = Flask(__name__)
 
-# Mood keywords
-greeting_keywords = ['hello', 'hi', 'hey']
-study_keywords = ['study', 'focus', 'read']
-motivation_keywords = ['tired', 'lazy', 'no energy']
-fact_keywords = ['who is', 'what is', 'when did', 'explain', 'information', 'details']
-image_keywords = ['generate image of', 'draw', 'create image of']
+# Keyword categories
+greetings = ['hi', 'hello', 'hey']
+study_triggers = ['study', 'focus', 'homework']
+motivation_triggers = ['tired', 'lazy', 'no energy', 'demotivated']
 wiki_phrases = [
     'who is', 'what is', 'tell me about', 'explain',
     'information about', 'details about', 'can you tell me about',
@@ -18,76 +16,29 @@ wiki_phrases = [
     'please explain', 'what are', 'who are', 'information on',
     "what's", "whats", "what's the", "whats the"
 ]
+image_keywords = ['generate image of', 'create image of', 'draw']
+
+# Code triggers
 code_triggers = {
     'python code': 'python',
     'html code': 'html',
     'css code': 'css'
 }
-
-# Self code definitions
 self_codes = {
-    'python': '''# app.py
-from flask import Flask, render_template, request
-app = Flask(__name__)
-@app.route("/", methods=["GET", "POST"])
-def index():
-    return render_template("index.html")
-if __name__ == "__main__":
-    app.run(debug=True)''',
-
-    'html': '''<!-- templates/index.html -->
+    'python': '''# Python Example
+def greet():
+    print("Hello from Kris AI!")''',
+    'html': '''<!-- HTML Example -->
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Kris AI</title>
-  <link rel="stylesheet" href="/static/css/style.css" />
-</head>
-<body>
-  <div class="chat-container">
-    <!-- Top Bar -->
-    <div class="top-bar">
-      <div class="branding">
-        <h1>Kris AI</h1>
-        <p>Your calm, smart companion</p>
-      </div>
-      <div class="kris-face-wrapper">
-        <div class="kris-face">
-          <div class="feather"></div>
-          <div class="eyes">
-            <div class="eye"></div>
-            <div class="eye"></div>
-          </div>
-          <div class="mouth">
-            <div class="default-mouth"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Chat -->
-    <div class="chat-box">
-      {% if user_message %}
-        <div class="message user">{{ user_message }}</div>
-      {% endif %}
-      {% if reply %}
-        <div class="message bot">{{ reply|safe }}</div>
-      {% endif %}
-    </div>
-    <!-- Input -->
-    <form method="POST">
-      <input name="message" type="text" placeholder="Talk to Kris AI..." autocomplete="off" />
-      <button type="submit">Send</button>
-    </form>
-  </div>
-</body>
-</html>''',
-
-    'css': '''/* static/css/style.css */
-/* Your final CSS you already provided — paste here */'''
+<html><body><h1>Hello</h1></body></html>''',
+    'css': '''/* CSS Example */
+body {
+  background-color: lightblue;
+}'''
 }
 
-# Wikipedia with DuckDuckGo fallback
-def get_wiki_or_ddg_answer(query):
+# Wikipedia or fallback to DuckDuckGo
+def get_summary(query):
     try:
         return wikipedia.summary(query, sentences=2)
     except:
@@ -95,15 +46,15 @@ def get_wiki_or_ddg_answer(query):
             search = DuckDuckGoSearch()
             results = search.text(query, max_results=1)
             if results:
-                return results[0]['body'] or f"Here's something I found: {results[0]['href']}"
+                return results[0]['body'] or f"Link: {results[0]['href']}"
             return "I couldn't find anything useful."
         except Exception as e:
-            return f"I'm having trouble searching. Try again soon. ({str(e)})"
+            return f"Search failed. ({str(e)})"
 
 # Simulated image generation
-def generate_image_response(prompt):
-    fake_img_id = uuid.uuid4().hex[:6]
-    return f"🖼️ Imagine this: *{prompt.title()}*. (Image ID: `{fake_img_id}` — This is a placeholder for now.)"
+def generate_image(prompt):
+    fake_id = uuid.uuid4().hex[:6]
+    return f"🖼️ Imagine this: *{prompt.title()}*. (Image ID: `{fake_id}` — Placeholder)"
 
 @app.route("/", methods=["GET", "POST"])
 def index():
@@ -114,23 +65,25 @@ def index():
         msg = request.form.get("message", "").lower().strip()
         user_message = msg
 
-        # Mood & smart handling
-        if any(word in msg for word in greeting_keywords):
-            reply = "Hello! 😊 I'm Kris AI, your calm, helpful assistant. Ask me anything!"
-        elif any(word in msg for word in study_keywords):
-            reply = "Focus mode on 📚. Let’s tackle your study goals step by step!"
-        elif any(word in msg for word in motivation_keywords):
-            reply = "You’ve got this! 💪 Take a deep breath and keep moving forward."
+        if any(word in msg for word in greetings):
+            reply = "👋 Hey there! I'm Kris AI. How can I help you today?"
+        elif any(word in msg for word in study_triggers):
+            reply = "📘 Let's get in study mode! Stay focused and break things into small steps."
+        elif any(word in msg for word in motivation_triggers):
+            reply = "💪 Don't give up! You've got the strength to keep going. Take a deep breath and keep pushing!"
         elif any(k in msg for k in code_triggers.keys()):
-            code_type = code_triggers[[k for k in code_triggers if k in msg][0]]
-            reply = f"<pre><code>{self_codes[code_type]}</code></pre>"
+            key = [k for k in code_triggers if k in msg][0]
+            lang = code_triggers[key]
+            reply = f"<pre><code>{self_codes[lang]}</code></pre>"
         elif any(k in msg for k in image_keywords):
-            prompt = msg.replace("generate image of", "").replace("create image of", "").strip()
-            reply = generate_image_response(prompt)
+            prompt = msg
+            for k in image_keywords:
+                prompt = prompt.replace(k, '')
+            reply = generate_image(prompt.strip())
         elif any(phrase in msg for phrase in wiki_phrases):
-            reply = get_wiki_or_ddg_answer(msg)
+            reply = get_summary(msg)
         else:
-            reply = "🤔 I’m not sure how to respond yet, but I’m always learning!"
+            reply = "🤔 I’m not sure how to answer that yet, but I’m always learning!"
 
     return render_template("index.html", reply=reply, user_message=user_message)
 
