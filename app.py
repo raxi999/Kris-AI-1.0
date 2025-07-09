@@ -62,7 +62,7 @@ def index():
     user_message = ""
 
     if request.method == "POST":
-        msg = request.form.get("message", "").lower().strip()
+        msg = request.form.get("user_input", "").lower().strip()
         user_message = msg
 
         if any(word in msg for word in greetings):
