@@ -5,7 +5,7 @@ import uuid
 
 app = Flask(__name__)
 
-# Keyword categories
+# Keywords
 greetings = ['hi', 'hello', 'hey']
 study_triggers = ['study', 'focus', 'homework']
 motivation_triggers = ['tired', 'lazy', 'no energy', 'demotivated']
@@ -18,7 +18,7 @@ wiki_phrases = [
 ]
 image_keywords = ['generate image of', 'create image of', 'draw']
 
-# Code triggers
+# Code snippet triggers
 code_triggers = {
     'python code': 'python',
     'html code': 'html',
@@ -37,24 +37,49 @@ body {
 }'''
 }
 
-# Wikipedia or fallback to DuckDuckGo
+# Clean user message to extract topic
+def clean_query(msg):
+    msg = msg.lower()
+    for phrase in wiki_phrases:
+        if phrase in msg:
+            msg = msg.replace(phrase, '')
+    return msg.strip()
+
+# Summary using Wikipedia with DDG fallback
 def get_summary(query):
+    topic = clean_query(query)
     try:
-        return wikipedia.summary(query, sentences=2)
+        result = wikipedia.summary(topic, sentences=2)
+        if topic.lower() not in result.lower():
+            raise ValueError("Unrelated result")
+        return result
     except:
         try:
             with DDGS() as ddgs:
-                results = ddgs.text(query, max_results=1)
+                results = ddgs.text(topic, region='wt-wt', safesearch='moderate', timelimit='y', max_results=1)
                 if results:
-                    return results[0]['body'] or f"Link: {results[0]['href']}"
-                return "I couldn't find anything useful."
+                    body = results[0].get('body')
+                    href = results[0].get('href')
+                    if body:
+                        return body
+                    elif href:
+                        return f"🔗 Here's something I found: {href}"
+                return "I couldn't find any useful info on that topic."
         except Exception as e:
             return f"Search failed. ({str(e)})"
 
-# Simulated image generation
+# Real image generation using DuckDuckGo
 def generate_image(prompt):
-    fake_id = uuid.uuid4().hex[:6]
-    return f"🖼️ Imagine this: *{prompt.title()}*. (Image ID: `{fake_id}` — Placeholder)"
+    try:
+        with DDGS() as ddgs:
+            results = ddgs.images(prompt, max_results=1, region='wt-wt', safesearch='moderate')
+            if results:
+                img_url = results[0].get("image")
+                if img_url:
+                    return f'<p>🖼️ Here is what I found for: <b>{prompt.title()}</b></p><img src="{img_url}" alt="{prompt}" style="max-width: 100%; border-radius: 12px; box-shadow: 0 0 10px #444;">'
+            return "I couldn’t generate the image right now. Try again later."
+    except Exception as e:
+        return f"❌ Image generation failed. ({str(e)})"
 
 @app.route("/", methods=["GET", "POST"])
 def index():
